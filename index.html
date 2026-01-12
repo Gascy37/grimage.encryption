@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星光_图片混淆TOOL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            min-height: 100vh;
+            background: 
+                linear-gradient(135deg, #000000 0%, transparent 50%, #87ceeb 100%),
+                linear-gradient(225deg, #ffc0cb 0%, transparent 50%, #ffffff 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+        
+        .content {
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            text-align: left;
+            font-weight: 600;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .title-icons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .title-icon {
+            height: 1.8rem;
+            width: auto;
+            vertical-align: middle;
+        }
+        
+        .file-selector {
+            background-color: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .file-button {
+            background-color: rgba(106, 17, 203, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: white;
+            width: 200px;
+            height: 55px;
+            border-radius: 12px;
+            position: relative;
+            display: inline-block;
+            transition: all 0.25s ease;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            font-weight: 600;
+            font-size: 17px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        
+        .file-button:hover {
+            background-color: rgba(106, 17, 203, 0.5);
+            transform: translateY(-3px);
+        }
+        
+        .file-button:active {
+            background-color: rgba(106, 17, 203, 0.35);
+            transform: translateY(0);
+        }
+        
+        .file-button span {
+            line-height: 55px;
+            display: block;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        
+        .ipt_btn {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .format-options {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .format-options label {
+            color: white;
+            font-weight: 500;
+            font-size: 16px;
+            margin-right: 10px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        
+        .format-select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.15);
+            font-size: 15px;
+            color: white;
+            margin-bottom: 15px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        .format-select:focus {
+            outline: none;
+            border-color: rgba(106, 17, 203, 0.7);
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+        
+        .format-select option {
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+        }
+        
+        /* 设置区域 */
+        .settings-options {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .settings-summary {
+            color: white;
+            font-weight: 500;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+        
+        .settings-summary::after {
+            content: "▼";
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+        
+        .settings-options[open] .settings-summary::after {
+            transform: rotate(180deg);
+        }
+        
+        .settings-content {
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sub-settings {
+            margin-bottom: 20px;
+        }
+        
+        .sub-settings:last-child {
+            margin-bottom: 0;
+        }
+        
+        .sub-summary {
+            color: white;
+            font-weight: 500;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .sub-summary::after {
+            content: "▼";
+            font-size: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .sub-settings[open] .sub-summary::after {
+            transform: rotate(180deg);
+        }
+        
+        .sub-content {
+            padding: 10px 0 0 15px;
+        }
+        
+        .setting-item {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .setting-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .setting-item label {
+            color: white;
+            font-weight: 400;
+            font-size: 14px;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        
+        .setting-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #8e2de2;
+        }
+        
+        /* 质量滑块区域 */
+        .quality-option {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .quality-label {
+            display: block;
+            color: white;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        
+        .quality-slider-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        #quality-range {
+            flex: 1;
+            max-width: 200px;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            outline: none;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        #quality-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            border: 2px solid rgba(142, 45, 226, 0.8);
+        }
+        
+        #quality-range::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            border: 2px solid rgba(142, 45, 226, 0.8);
+        }
+        
+        #quality-value {
+            display: inline-block;
+            width: 45px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 17px;
+            color: white;
+            background-color: rgba(142, 45, 226, 0.6);
+            padding: 7px 12px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        /* 操作按钮区域 */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .action-button-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .action-button {
+            height: 60px;
+            padding: 0 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 140px;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .action-button:hover {
+            transform: translateY(-3px);
+        }
+        
+        .action-button:active {
+            transform: translateY(0);
+        }
+        
+        #enc {
+            background-color: rgba(79, 23, 135, 0.4);
+            color: #e6ccff;
+        }
+        
+        #enc:hover {
+            background-color: rgba(79, 23, 135, 0.5);
+        }
+        
+        #enc:active {
+            background-color: rgba(79, 23, 135, 0.35);
+        }
+        
+        #dec {
+            background-color: rgba(235, 54, 120, 0.4);
+            color: #ffd9e6;
+        }
+        
+        #dec:hover {
+            background-color: rgba(235, 54, 120, 0.5);
+        }
+        
+        #dec:active {
+            background-color: rgba(235, 54, 120, 0.35);
+        }
+        
+        #re {
+            background-color: rgba(251, 119, 60, 0.4);
+            color: #ffe6d9;
+            display: none;
+        }
+        
+        #re:hover {
+            background-color: rgba(251, 119, 60, 0.5);
+        }
+        
+        #re:active {
+            background-color: rgba(251, 119, 60, 0.35);
+        }
+        
+        .image-container {
+            width: min(400px, 80vw, 80vh);
+            height: min(400px, 80vw, 80vh);
+            margin: 0 auto;
+            position: relative;
+            background-color: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        #display-img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+            object-fit: contain;
+        }
+        
+        .loader {
+            width: 200px;
+            height: 200px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .loader div {
+            border-width: 5px;
+            border-style: solid;
+            border-left-color: #fff;
+            border-right-color: #fff;
+            border-top-color: transparent;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            position: absolute;
+            animation: spin 2s ease infinite;
+        }
+        
+        .loader div:nth-child(1) {
+            width: 50px;
+            height: 50px;
+            left: 70px;
+            top: 70px;
+        }
+        
+        .loader div:nth-child(2) {
+            width: 70px;
+            height: 70px;
+            left: 60px;
+            top: 60px;
+            animation-delay: 0.1s;
+        }
+        
+        .loader div:nth-child(3) {
+            width: 90px;
+            height: 90px;
+            left: 50px;
+            top: 50px;
+            animation-delay: 0.2s;
+        }
+        
+        .loader div:nth-child(4) {
+            width: 110px;
+            height: 110px;
+            left: 40px;
+            top: 40px;
+            animation-delay: 0.3s;
+        }
+
+        @keyframes spin {
+            50% {
+                transform: rotate(180deg);
+            }
+            100% {
+                transform: rotate(0);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .content {
+                padding: 15px;
+                max-width: 100%;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+                gap: 8px;
+            }
+            
+            .title-icon {
+                height: 1.5rem;
+            }
+            
+            .title-icons {
+                gap: 6px;
+            }
+            
+            .file-selector, .format-options, .settings-options {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .file-button {
+                width: 180px;
+                height: 50px;
+            }
+            
+            .file-button span {
+                line-height: 50px;
+                font-size: 16px;
+            }
+            
+            .action-button {
+                height: 55px;
+                min-width: 120px;
+                padding: 0 20px;
+                font-size: 16px;
+            }
+            
+            .action-button-row {
+                gap: 10px;
+            }
+            
+            .image-container {
+                width: min(300px, 80vw, 80vh);
+                height: min(300px, 80vw, 80vh);
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .action-button-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+            }
+            
+            .action-button {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .image-container {
+                width: min(250px, 80vw, 80vh);
+                height: min(250px, 80vw, 80vh);
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+            }
+            
+            .title-icon {
+                height: 1.4rem;
+            }
+            
+            .title-icons {
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    
+    <div class="content" id="content">
+        <h1>
+            星光_图片混淆TOOL
+            <div class="title-icons">
+                <img src="https://icdn.binmt.cc/2601/6965402c97944.png" alt="Gascy" class="title-icon">
+                <img src="https://icdn.binmt.cc/2601/696542b60bf4c.png" alt="ctn" class="title-icon">
+            </div>
+        </h1>
+        
+        <div class="file-selector">
+            <div class="file-button">
+                <span>选择图片</span>
+                <input type="file" accept="image/*" id="ipt" class="ipt_btn" />
+            </div>
+        </div>
+        
+        <div class="format-options">
+            <label for="format-select">输出格式:</label>
+            <select id="format-select" class="format-select">
+                <option value="png" selected>PNG (无损)</option>
+                <option value="jpg">JPG (有损)</option>
+            </select>
+            
+            <div id="quality-option" class="quality-option">
+                <div class="quality-label">图片质量:</div>
+                <div class="quality-slider-container">
+                    <input type="range" id="quality-range" min="10" max="100" value="95">
+                    <span id="quality-value">95</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 新增设置区域 -->
+        <details class="settings-options" id="settings-options">
+            <summary class="settings-summary">设置</summary>
+            <div class="settings-content">
+                <details class="sub-settings">
+                    <summary class="sub-summary">混淆设置</summary>
+                    <div class="sub-content">
+                        <div class="setting-item">
+                            <input type="checkbox" id="enable-green" class="setting-checkbox">
+                            <label for="enable-green">绿图 (增强绿色80%)</label>
+                        </div>
+                    </div>
+                </details>
+                
+                <details class="sub-settings">
+                    <summary class="sub-summary">解混淆设置</summary>
+                    <div class="sub-content">
+                        <div class="setting-item">
+                            <input type="checkbox" id="reduce-green" class="setting-checkbox">
+                            <label for="reduce-green">减弱绿色效果</label>
+                        </div>
+                        <div class="setting-item">
+                            <input type="checkbox" id="enhance-red-blue" class="setting-checkbox">
+                            <label for="enhance-red-blue">增强红蓝效果(不推荐)</label>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </details>
+        
+        <div class="action-buttons">
+            <div class="action-button-row">
+                <button id="enc" class="action-button">混淆图片</button>
+                <button id="dec" class="action-button">解混淆</button>
+            </div>
+            <div class="action-button-row">
+                <button id="re" class="action-button">还原原图</button>
+            </div>
+        </div>
+        
+        <div class="image-container">
+            <img id="display-img" />
+        </div>
+    </div>
+    
+<script>
+// 改进的 gilbert2d 函数 - 使用迭代方式避免递归栈溢出
+function gilbert2d(width, height) {
+    const coordinates = [];
+    
+    // 使用堆栈模拟递归，避免调用栈溢出
+    const stack = [];
+    
+    if (width >= height) {
+        stack.push({x: 0, y: 0, ax: width, ay: 0, bx: 0, by: height});
+    } else {
+        stack.push({x: 0, y: 0, ax: 0, ay: height, bx: width, by: 0});
+    }
+    
+    while (stack.length > 0) {
+        const {x, y, ax, ay, bx, by} = stack.pop();
+        
+        const w = Math.abs(ax + ay);
+        const h = Math.abs(bx + by);
+        
+        const dax = Math.sign(ax), day = Math.sign(ay);
+        const dbx = Math.sign(bx), dby = Math.sign(by);
+        
+        if (h === 1) {
+            // 简单的行填充
+            let curX = x, curY = y;
+            for (let i = 0; i < w; i++) {
+                coordinates.push([curX, curY]);
+                curX += dax;
+                curY += day;
+            }
+            continue;
+        }
+        
+        if (w === 1) {
+            // 简单的列填充
+            let curX = x, curY = y;
+            for (let i = 0; i < h; i++) {
+                coordinates.push([curX, curY]);
+                curX += dbx;
+                curY += dby;
+            }
+            continue;
+        }
+        
+        let ax2 = Math.floor(ax / 2), ay2 = Math.floor(ay / 2);
+        let bx2 = Math.floor(bx / 2), by2 = Math.floor(by / 2);
+        
+        const w2 = Math.abs(ax2 + ay2);
+        const h2 = Math.abs(bx2 + by2);
+        
+        if (2 * w > 3 * h) {
+            if ((w2 % 2) && (w > 2)) {
+                // 偏好偶数步长
+                ax2 += dax;
+                ay2 += day;
+            }
+            
+            // 长形情况: 仅分割为两部分
+            // 注意入栈顺序，后入栈的先处理
+            stack.push({x: x + ax2, y: y + ay2, ax: ax - ax2, ay: ay - ay2, bx, by});
+            stack.push({x, y, ax: ax2, ay: ay2, bx, by});
+        } else {
+            if ((h2 % 2) && (h > 2)) {
+                // 偏好偶数步长
+                bx2 += dbx;
+                by2 += dby;
+            }
+            
+            // 标准情况: 向上一步, 一长段水平, 向下一步
+            // 注意入栈顺序，后入栈的先处理
+            stack.push({x: x + (ax - dax) + (bx2 - dbx), y: y + (ay - day) + (by2 - dby),
+                ax: -bx2, ay: -by2, bx: -(ax - ax2), by: -(ay - ay2)});
+            stack.push({x: x + bx2, y: y + by2, ax, ay, bx: bx - bx2, by: by - by2});
+            stack.push({x, y, ax: bx2, ay: by2, bx: ax2, by: ay2});
+        }
+    }
+    
+    return coordinates;
+}
+</script>
+<script>
+const img = document.getElementById("display-img");
+const loader = document.getElementById("loader");
+const encBtn = document.getElementById("enc");
+const decBtn = document.getElementById("dec");
+const restoreBtn = document.getElementById("re");
+const formatSelect = document.getElementById("format-select");
+const qualityOption = document.getElementById("quality-option");
+const qualityRange = document.getElementById("quality-range");
+const qualityValue = document.getElementById("quality-value");
+
+// 新增设置相关元素
+const enableGreen = document.getElementById("enable-green");
+const reduceGreen = document.getElementById("reduce-green");
+const enhanceRedBlue = document.getElementById("enhance-red-blue");
+
+// 状态变量
+let hasEncrypted = false;
+let hasDecrypted = false;
+let hasProcessed = false;
+
+// 存储当前blob URL以便释放
+let currentBlobURLs = [];
+
+// 释放所有blob URL的函数
+function releaseAllBlobURLs() {
+    currentBlobURLs.forEach(url => {
+        if (url && url.startsWith('blob:')) {
+            URL.revokeObjectURL(url);
+        }
+    });
+    currentBlobURLs = [];
+}
+
+// 安全设置图片src并管理内存
+function setImageSrc(src) {
+    // 释放之前的blob URL
+    releaseAllBlobURLs();
+    
+    // 如果新的是blob URL，存储它以便后续释放
+    if (src && src.startsWith('blob:')) {
+        currentBlobURLs.push(src);
+    }
+    
+    img.src = src;
+    img.onload = function() {
+        img.style.display = "block";
+    };
+}
+
+// 显示加载动画
+function showLoader() {
+    loader.style.display = "block";
+}
+
+// 隐藏加载动画
+function hideLoader() {
+    loader.style.display = "none";
+}
+
+// 重置按钮状态
+function resetButtonStates() {
+    hasEncrypted = false;
+    hasDecrypted = false;
+    hasProcessed = false;
+    encBtn.style.display = "flex";
+    decBtn.style.display = "flex";
+    restoreBtn.style.display = "none";
+}
+
+// 显示还原按钮（当进行过处理时）
+function showRestoreButton() {
+    hasProcessed = true;
+    restoreBtn.style.display = "flex";
+}
+
+// RGB到HSL转换
+function rgbToHsl(r, g, b) {
+    r /= 255, g /= 255, b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+
+    if (max === min) {
+        h = s = 0; // 无色
+    } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+
+    return [h * 360, s * 100, l * 100];
+}
+
+// HSL到RGB转换
+function hslToRgb(h, s, l) {
+    h /= 360;
+    s /= 100;
+    l /= 100;
+    let r, g, b;
+
+    if (s === 0) {
+        r = g = b = l; // 无色
+    } else {
+        const hue2rgb = (p, q, t) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1/6) return p + (q - p) * 6 * t;
+            if (t < 1/2) return q;
+            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        };
+
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+    }
+
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+
+// 颜色处理函数 - 修复版本
+function adjustGreenColor(data, enhance = true) {
+    const result = new Uint8ClampedArray(data.length);
+    
+    for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+        
+        // 转换为HSL以更好地控制颜色
+        const [h, s, l] = rgbToHsl(r, g, b);
+        
+        let newR = r, newG = g, newB = b;
+        
+        // 检查是否为绿色调（HSL中的绿色范围大约为90-180度）
+        const isGreenish = h >= 90 && h <= 180;
+        
+        if (enhance) {
+            // 增强绿色效果（绿图功能）
+            if (isGreenish) {
+                // 对于绿色调，显著增加绿色通道
+                newG = Math.min(255, g * 1.8);
+                // 同时稍微减少红色和蓝色以增强绿色效果
+                newR = Math.max(0, r * 0.8);
+                newB = Math.max(0, b * 0.8);
+            }
+        } else {
+            // 减弱绿色效果（解混淆设置）
+            if (isGreenish) {
+                // 对于绿色调，减少绿色通道
+                newG = Math.max(0, g * 0.7);
+                // 稍微增加红色和蓝色以平衡颜色
+                newR = Math.min(255, r * 1.2);
+                newB = Math.min(255, b * 1.2);
+            }
+        }
+        
+        result[i] = Math.round(newR);
+        result[i + 1] = Math.round(newG);
+        result[i + 2] = Math.round(newB);
+        result[i + 3] = a; // 保持alpha通道不变
+    }
+    
+    return result;
+}
+
+function adjustRedBlueColor(data, enhance = true) {
+    const result = new Uint8ClampedArray(data.length);
+    
+    for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+        
+        // 转换为HSL
+        const [h, s, l] = rgbToHsl(r, g, b);
+        
+        let newR = r, newG = g, newB = b;
+        
+        // 检查是否为红色调（0-30度和330-360度）或蓝色调（210-270度）
+        const isReddish = (h >= 0 && h <= 30) || (h >= 330 && h <= 360);
+        const isBluish = h >= 210 && h <= 270;
+        
+        if (enhance) {
+            // 增强红蓝效果
+            if (isReddish) {
+                // 增强红色
+                newR = Math.min(255, r * 1.5);
+                newG = Math.max(0, g * 0.9);
+                newB = Math.max(0, b * 0.9);
+            } else if (isBluish) {
+                // 增强蓝色
+                newB = Math.min(255, b * 1.5);
+                newR = Math.max(0, r * 0.9);
+                newG = Math.max(0, g * 0.9);
+            }
+        } else {
+            // 减弱红蓝效果（如果需要的话）
+            if (isReddish) {
+                newR = Math.max(0, r * 0.8);
+            } else if (isBluish) {
+                newB = Math.max(0, b * 0.8);
+            }
+        }
+        
+        result[i] = Math.round(newR);
+        result[i + 1] = Math.round(newG);
+        result[i + 2] = Math.round(newB);
+        result[i + 3] = a; // 保持alpha通道不变
+    }
+    
+    return result;
+}
+
+function encrypt(imgElement){
+    showLoader();
+    
+    setTimeout(() => {
+        const cvs = document.createElement("canvas");
+        const width = cvs.width = imgElement.width;
+        const height = cvs.height = imgElement.height;
+        const ctx = cvs.getContext("2d");
+        ctx.drawImage(imgElement, 0, 0);
+        let imgdata = ctx.getImageData(0, 0, width, height);
+        
+        // 检查是否开启绿图
+        if (enableGreen.checked) {
+            const enhancedData = adjustGreenColor(imgdata.data, true);
+            imgdata.data.set(enhancedData);
+        }
+        
+        const imgdata2 = new ImageData(width, height);
+        const curve = gilbert2d(width, height);
+        const offset = Math.round((Math.sqrt(5) - 1) / 2 * width * height);
+        
+        for(let i = 0; i < width * height; i++){
+            const old_pos = curve[i];
+            const new_pos = curve[(i + offset) % (width * height)];
+            const old_p = 4 * (old_pos[0] + old_pos[1] * width);
+            const new_p = 4 * (new_pos[0] + new_pos[1] * width);
+            imgdata2.data.set(imgdata.data.slice(old_p, old_p + 4), new_p);
+        }
+        ctx.putImageData(imgdata2, 0, 0);
+        
+        const format = formatSelect.value;
+        if (format === 'png') {
+            cvs.toBlob(b => {
+                const blobURL = URL.createObjectURL(b);
+                setImageSrc(blobURL);
+                hideLoader();
+                encBtn.style.display = "none";
+                hasEncrypted = true;
+                showRestoreButton();
+            }, "image/png");
+        } else {
+            const quality = parseInt(qualityRange.value) / 100;
+            cvs.toBlob(b => {
+                const blobURL = URL.createObjectURL(b);
+                setImageSrc(blobURL);
+                hideLoader();
+                encBtn.style.display = "none";
+                hasEncrypted = true;
+                showRestoreButton();
+            }, "image/jpeg", quality);
+        }
+    }, 50);
+}
+
+function decrypt(imgElement){
+    showLoader();
+    
+    setTimeout(() => {
+        const cvs = document.createElement("canvas");
+        const width = cvs.width = imgElement.width;
+        const height = cvs.height = imgElement.height;
+        const ctx = cvs.getContext("2d");
+        ctx.drawImage(imgElement, 0, 0);
+        let imgdata = ctx.getImageData(0, 0, width, height);
+        const imgdata2 = new ImageData(width, height);
+        const curve = gilbert2d(width, height);
+        const offset = Math.round((Math.sqrt(5) - 1) / 2 * width * height);
+        
+        for(let i = 0; i < width * height; i++){
+            const old_pos = curve[i];
+            const new_pos = curve[(i + offset) % (width * height)];
+            const old_p = 4 * (old_pos[0] + old_pos[1] * width);
+            const new_p = 4 * (new_pos[0] + new_pos[1] * width);
+            imgdata2.data.set(imgdata.data.slice(new_p, new_p + 4), old_p);
+        }
+        
+        // 解混淆后的图像数据
+        let finalData = new Uint8ClampedArray(imgdata2.data);
+        
+        // 检查是否开启减弱绿色效果
+        if (reduceGreen.checked) {
+            finalData = adjustGreenColor(finalData, false);
+        }
+        
+        // 检查是否开启增强红蓝效果
+        if (enhanceRedBlue.checked) {
+            finalData = adjustRedBlueColor(finalData, true);
+        }
+        
+        // 将处理后的数据放回ImageData
+        imgdata2.data.set(finalData);
+        ctx.putImageData(imgdata2, 0, 0);
+        
+        const format = formatSelect.value;
+        if (format === 'png') {
+            cvs.toBlob(b => {
+                const blobURL = URL.createObjectURL(b);
+                setImageSrc(blobURL);
+                hideLoader();
+                decBtn.style.display = "none";
+                hasDecrypted = true;
+                showRestoreButton();
+            }, "image/png");
+        } else {
+            const quality = parseInt(qualityRange.value) / 100;
+            cvs.toBlob(b => {
+                const blobURL = URL.createObjectURL(b);
+                setImageSrc(blobURL);
+                hideLoader();
+                decBtn.style.display = "none";
+                hasDecrypted = true;
+                showRestoreButton();
+            }, "image/jpeg", quality);
+        }
+    }, 50);
+}
+
+const ipt = document.getElementById("ipt");
+ipt.onchange = () => {
+    if(ipt.files.length > 0){
+        resetButtonStates();
+        img.style.display = "none";
+        const fileURL = URL.createObjectURL(ipt.files[0]);
+        setImageSrc(fileURL);
+    }
+}
+
+encBtn.onclick = () => {
+    if(img.src && !hasEncrypted){
+        img.style.display = "none";
+        encrypt(img);
+    }
+}
+
+decBtn.onclick = () => {
+    if(img.src && !hasDecrypted){
+        img.style.display = "none";
+        decrypt(img);
+    }
+}
+
+restoreBtn.onclick = () => {
+    if(ipt.files.length > 0){
+        resetButtonStates();
+        img.style.display = "none";
+        const fileURL = URL.createObjectURL(ipt.files[0]);
+        setImageSrc(fileURL);
+    }
+}
+
+// 格式选择改变事件
+formatSelect.addEventListener('change', function() {
+    if(this.value === 'jpg') {
+        qualityOption.style.display = 'block';
+    } else {
+        qualityOption.style.display = 'none';
+    }
+});
+
+// 质量滑块值显示
+qualityRange.addEventListener('input', function() {
+    qualityValue.textContent = this.value;
+});
+
+// 解混淆设置互斥逻辑
+reduceGreen.addEventListener('change', function() {
+    if(this.checked) {
+        enhanceRedBlue.checked = false;
+    }
+});
+
+enhanceRedBlue.addEventListener('change', function() {
+    if(this.checked) {
+        reduceGreen.checked = false;
+    }
+});
+
+// 初始显示质量值
+qualityValue.textContent = qualityRange.value;
+
+// 页面卸载时释放所有blob URL
+window.addEventListener('beforeunload', function() {
+    releaseAllBlobURLs();
+});
+</script>
+</body>
+</html>
