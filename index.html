@@ -36,7 +36,7 @@
         
         h1 {
             color: white;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-size: 1.8rem;
             letter-spacing: 1px;
             text-align: left;
@@ -57,6 +57,28 @@
             height: 1.8rem;
             width: auto;
             vertical-align: middle;
+        }
+        
+        .image-container {
+            width: min(400px, 80vw, 80vh);
+            height: min(400px, 80vw, 80vh);
+            margin: 0 auto 25px;
+            position: relative;
+            background-color: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        #display-img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+            object-fit: contain;
         }
         
         .file-selector {
@@ -112,6 +134,86 @@
             height: 100%;
             opacity: 0;
             cursor: pointer;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .action-button-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .action-button {
+            height: 60px;
+            padding: 0 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 140px;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .action-button:hover {
+            transform: translateY(-3px);
+        }
+        
+        .action-button:active {
+            transform: translateY(0);
+        }
+        
+        #enc {
+            background-color: rgba(79, 23, 135, 0.4);
+            color: #e6ccff;
+        }
+        
+        #enc:hover {
+            background-color: rgba(79, 23, 135, 0.5);
+        }
+        
+        #enc:active {
+            background-color: rgba(79, 23, 135, 0.35);
+        }
+        
+        #dec {
+            background-color: rgba(235, 54, 120, 0.4);
+            color: #ffd9e6;
+        }
+        
+        #dec:hover {
+            background-color: rgba(235, 54, 120, 0.5);
+        }
+        
+        #dec:active {
+            background-color: rgba(235, 54, 120, 0.35);
+        }
+        
+        #re {
+            background-color: rgba(251, 119, 60, 0.4);
+            color: #ffe6d9;
+            display: none;
+        }
+        
+        #re:hover {
+            background-color: rgba(251, 119, 60, 0.5);
+        }
+        
+        #re:active {
+            background-color: rgba(251, 119, 60, 0.35);
         }
         
         .format-options {
@@ -323,109 +425,6 @@
             -webkit-backdrop-filter: blur(5px);
         }
         
-        /* 操作按钮区域 */
-        .action-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .action-button-row {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        
-        .action-button {
-            height: 60px;
-            padding: 0 30px;
-            border: none;
-            border-radius: 12px;
-            font-size: 17px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 140px;
-            letter-spacing: 0.5px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .action-button:hover {
-            transform: translateY(-3px);
-        }
-        
-        .action-button:active {
-            transform: translateY(0);
-        }
-        
-        #enc {
-            background-color: rgba(79, 23, 135, 0.4);
-            color: #e6ccff;
-        }
-        
-        #enc:hover {
-            background-color: rgba(79, 23, 135, 0.5);
-        }
-        
-        #enc:active {
-            background-color: rgba(79, 23, 135, 0.35);
-        }
-        
-        #dec {
-            background-color: rgba(235, 54, 120, 0.4);
-            color: #ffd9e6;
-        }
-        
-        #dec:hover {
-            background-color: rgba(235, 54, 120, 0.5);
-        }
-        
-        #dec:active {
-            background-color: rgba(235, 54, 120, 0.35);
-        }
-        
-        #re {
-            background-color: rgba(251, 119, 60, 0.4);
-            color: #ffe6d9;
-            display: none;
-        }
-        
-        #re:hover {
-            background-color: rgba(251, 119, 60, 0.5);
-        }
-        
-        #re:active {
-            background-color: rgba(251, 119, 60, 0.35);
-        }
-        
-        .image-container {
-            width: min(400px, 80vw, 80vh);
-            height: min(400px, 80vw, 80vh);
-            margin: 0 auto;
-            position: relative;
-            background-color: transparent;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        #display-img {
-            max-width: 100%;
-            max-height: 100%;
-            display: none;
-            object-fit: contain;
-        }
-        
         .loader {
             width: 200px;
             height: 200px;
@@ -509,6 +508,12 @@
                 gap: 6px;
             }
             
+            .image-container {
+                width: min(300px, 80vw, 80vh);
+                height: min(300px, 80vw, 80vh);
+                margin-bottom: 20px;
+            }
+            
             .file-selector, .format-options, .settings-options {
                 padding: 20px;
                 margin-bottom: 20px;
@@ -533,11 +538,6 @@
             
             .action-button-row {
                 gap: 10px;
-            }
-            
-            .image-container {
-                width: min(300px, 80vw, 80vh);
-                height: min(300px, 80vw, 80vh);
             }
         }
         
@@ -584,15 +584,29 @@
         <h1>
             星光_图片混淆TOOL
             <div class="title-icons">
-                <img src="https://icdn.binmt.cc/2601/6965402c97944.png" alt="Gascy" class="title-icon">
-                <img src="https://icdn.binmt.cc/2601/696542b60bf4c.png" alt="ctn" class="title-icon">
+                <img src="https://github.com/Gascy37/grimage.encryption/image/Gascy.png" alt="Gascy" class="title-icon">
+                <img src="https://github.com/Gascy37/grimage.encryption/image/ctn.png" alt="ctn" class="title-icon">
             </div>
         </h1>
+        
+        <div class="image-container">
+            <img id="display-img" />
+        </div>
         
         <div class="file-selector">
             <div class="file-button">
                 <span>选择图片</span>
                 <input type="file" accept="image/*" id="ipt" class="ipt_btn" />
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <div class="action-button-row">
+                <button id="enc" class="action-button">混淆图片</button>
+                <button id="dec" class="action-button">解混淆</button>
+            </div>
+            <div class="action-button-row">
+                <button id="re" class="action-button">还原原图</button>
             </div>
         </div>
         
@@ -612,7 +626,6 @@
             </div>
         </div>
         
-        <!-- 新增设置区域 -->
         <details class="settings-options" id="settings-options">
             <summary class="settings-summary">设置</summary>
             <div class="settings-content">
@@ -641,20 +654,6 @@
                 </details>
             </div>
         </details>
-        
-        <div class="action-buttons">
-            <div class="action-button-row">
-                <button id="enc" class="action-button">混淆图片</button>
-                <button id="dec" class="action-button">解混淆</button>
-            </div>
-            <div class="action-button-row">
-                <button id="re" class="action-button">还原原图</button>
-            </div>
-        </div>
-        
-        <div class="image-container">
-            <img id="display-img" />
-        </div>
     </div>
     
 <script>
