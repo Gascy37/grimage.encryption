@@ -25,6 +25,24 @@
             flex-direction: column;
             overflow-x: hidden;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            /* 修复白块闪现问题 */
+            background-attachment: fixed;
+            position: relative;
+        }
+        
+        /* 添加背景覆盖层防止白块 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(135deg, #000000 0%, transparent 50%, #87ceeb 100%),
+                linear-gradient(225deg, #ffc0cb 0%, transparent 50%, #ffffff 100%);
+            z-index: -1;
+            pointer-events: none;
         }
         
         .content {
@@ -213,6 +231,36 @@
         
         #re:active {
             background-color: rgba(251, 119, 60, 0.35);
+        }
+        
+        /* 新增的清除图片按钮 */
+        #clear {
+            background-color: rgba(60, 179, 113, 0.4);
+            color: #d9ffe6;
+            display: none;
+        }
+        
+        #clear:hover {
+            background-color: rgba(60, 179, 113, 0.5);
+        }
+        
+        #clear:active {
+            background-color: rgba(60, 179, 113, 0.35);
+        }
+        
+        /* 下载图片按钮 */
+        #download {
+            background-color: rgba(50, 205, 50, 0.4);
+            color: #e6ffe6;
+            display: none;
+        }
+        
+        #download:hover {
+            background-color: rgba(50, 205, 50, 0.5);
+        }
+        
+        #download:active {
+            background-color: rgba(50, 205, 50, 0.35);
         }
         
         /* 输出格式区域 - 提高辨识度 */
@@ -616,6 +664,12 @@
             </div>
         </div>
         
+        <!-- 下载和清除图片按钮 - 调整顺序，下载在前，清除在后 -->
+        <div style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-bottom: 15px; gap: 10px;">
+            <button id="download" class="action-button" style="min-width: 200px;">下载图片</button>
+            <button id="clear" class="action-button" style="min-width: 200px;">清除图片</button>
+        </div>
+        
         <div class="format-options">
             <label for="format-select">输出格式:</label>
             <select id="format-select" class="format-select">
@@ -749,6 +803,8 @@ const loader = document.getElementById("loader");
 const encBtn = document.getElementById("enc");
 const decBtn = document.getElementById("dec");
 const restoreBtn = document.getElementById("re");
+const clearBtn = document.getElementById("clear");
+const downloadBtn = document.getElementById("download");
 const formatSelect = document.getElementById("format-select");
 const qualityOption = document.getElementById("quality-option");
 const qualityRange = document.getElementById("quality-range");
@@ -763,6 +819,8 @@ const enhanceRedBlue = document.getElementById("enhance-red-blue");
 let hasEncrypted = false;
 let hasDecrypted = false;
 let hasProcessed = false;
+let hasImage = false;
+let currentFileName = "";
 
 // 存储当前blob URL以便释放
 let currentBlobURLs = [];
@@ -811,12 +869,27 @@ function resetButtonStates() {
     encBtn.style.display = "flex";
     decBtn.style.display = "flex";
     restoreBtn.style.display = "none";
+    updateDownloadButtonVisibility();
 }
 
 // 显示还原按钮（当进行过处理时）
 function showRestoreButton() {
     hasProcessed = true;
     restoreBtn.style.display = "flex";
+    updateDownloadButtonVisibility();
+}
+
+// 更新下载按钮的显示/隐藏状态
+function updateDownloadButtonVisibility() {
+    // 下载按钮显示规则：
+    // 1. 有图片
+    // 2. 点击了混淆或解混淆按钮（即hasEncrypted或hasDecrypted为true）
+    // 3. 不是只剩下还原原图按钮的状态（即encBtn和decBtn至少有一个显示）
+    if (hasImage && (hasEncrypted || hasDecrypted) && (encBtn.style.display !== "none" || decBtn.style.display !== "none")) {
+        downloadBtn.style.display = "flex";
+    } else {
+        downloadBtn.style.display = "none";
+    }
 }
 
 // RGB到HSL转换
@@ -1005,6 +1078,7 @@ function encrypt(imgElement){
                 encBtn.style.display = "none";
                 hasEncrypted = true;
                 showRestoreButton();
+                updateDownloadButtonVisibility();
             }, "image/png");
         } else {
             const quality = parseInt(qualityRange.value) / 100;
@@ -1015,6 +1089,7 @@ function encrypt(imgElement){
                 encBtn.style.display = "none";
                 hasEncrypted = true;
                 showRestoreButton();
+                updateDownloadButtonVisibility();
             }, "image/jpeg", quality);
         }
     }, 50);
@@ -1068,6 +1143,7 @@ function decrypt(imgElement){
                 decBtn.style.display = "none";
                 hasDecrypted = true;
                 showRestoreButton();
+                updateDownloadButtonVisibility();
             }, "image/png");
         } else {
             const quality = parseInt(qualityRange.value) / 100;
@@ -1078,9 +1154,62 @@ function decrypt(imgElement){
                 decBtn.style.display = "none";
                 hasDecrypted = true;
                 showRestoreButton();
+                updateDownloadButtonVisibility();
             }, "image/jpeg", quality);
         }
     }, 50);
+}
+
+// 下载图片函数
+function downloadImage() {
+    if (!img.src) return;
+    
+    // 创建一个临时的a标签用于下载
+    const link = document.createElement('a');
+    link.download = getDownloadFileName();
+    link.href = img.src;
+    link.click();
+}
+
+// 生成下载文件名
+function getDownloadFileName() {
+    const format = formatSelect.value;
+    const prefix = hasEncrypted ? 'encrypted_' : hasDecrypted ? 'decrypted_' : 'image_';
+    const timestamp = new Date().getTime();
+    const extension = format === 'png' ? 'png' : 'jpg';
+    
+    if (currentFileName) {
+        const nameWithoutExt = currentFileName.replace(/\.[^/.]+$/, "");
+        return `${prefix}${nameWithoutExt}_${timestamp}.${extension}`;
+    }
+    
+    return `${prefix}${timestamp}.${extension}`;
+}
+
+// 清除图片函数
+function clearImage() {
+    // 释放所有blob URL
+    releaseAllBlobURLs();
+    
+    // 清除图片显示
+    img.style.display = "none";
+    img.src = "";
+    
+    // 重置文件输入
+    const ipt = document.getElementById("ipt");
+    ipt.value = "";
+    
+    // 重置状态
+    hasImage = false;
+    hasEncrypted = false;
+    hasDecrypted = false;
+    hasProcessed = false;
+    currentFileName = "";
+    
+    // 重置按钮状态
+    resetButtonStates();
+    clearBtn.style.display = "none";
+    downloadBtn.style.display = "none";
 }
 
 const ipt = document.getElementById("ipt");
@@ -1090,6 +1219,11 @@ ipt.onchange = () => {
         img.style.display = "none";
         const fileURL = URL.createObjectURL(ipt.files[0]);
         setImageSrc(fileURL);
+        hasImage = true;
+        currentFileName = ipt.files[0].name;
+        clearBtn.style.display = "flex";
+        // 选择图片后但不处理时，下载按钮应该隐藏
+        downloadBtn.style.display = "none";
     }
 }
 
@@ -1113,8 +1247,21 @@ restoreBtn.onclick = () => {
         img.style.display = "none";
         const fileURL = URL.createObjectURL(ipt.files[0]);
         setImageSrc(fileURL);
+        hasImage = true;
+        // 还原原图时，下载按钮应该隐藏
+        downloadBtn.style.display = "none";
     }
 }
+
+// 下载按钮点击事件
+downloadBtn.onclick = () => {
+    downloadImage();
+};
+
+// 清除按钮点击事件
+clearBtn.onclick = () => {
+    clearImage();
+};
 
 // 格式选择改变事件
 formatSelect.addEventListener('change', function() {
