@@ -35,7 +35,7 @@
         }
         
         h1 {
-            color: white;
+            color: #ff69b4;
             margin-bottom: 20px;
             font-size: 1.8rem;
             letter-spacing: 1px;
@@ -45,18 +45,17 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.7), 0 0 20px rgba(255, 105, 180, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
         }
-        
-        .title-icons {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .title-icon {
-            height: 1.8rem;
-            width: auto;
-            vertical-align: middle;
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 105, 180, 0.7), 0 0 20px rgba(255, 105, 180, 0.5);
+            }
+            to {
+                text-shadow: 0 0 15px rgba(255, 105, 180, 0.9), 0 0 25px rgba(255, 105, 180, 0.7), 0 0 35px rgba(255, 105, 180, 0.5);
+            }
         }
         
         .image-container {
@@ -216,75 +215,85 @@
             background-color: rgba(251, 119, 60, 0.35);
         }
         
+        /* 输出格式区域 - 提高辨识度 */
         .format-options {
-            background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background-color: rgba(30, 30, 50, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border-radius: 15px;
-            padding: 20px;
+            padding: 25px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(142, 45, 226, 0.5);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
         .format-options label {
-            color: white;
-            font-weight: 500;
-            font-size: 16px;
+            color: #e6ccff;
+            font-weight: 600;
+            font-size: 17px;
             margin-right: 10px;
             display: inline-block;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         }
         
         .format-select {
             width: 100%;
-            padding: 12px 16px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background-color: rgba(255, 255, 255, 0.15);
-            font-size: 15px;
-            color: white;
-            margin-bottom: 15px;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(106, 17, 203, 0.7);
+            background-color: rgba(20, 10, 40, 0.9);
+            font-size: 16px;
+            color: #ffffff;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
         
         .format-select:focus {
             outline: none;
-            border-color: rgba(106, 17, 203, 0.7);
-            background-color: rgba(255, 255, 255, 0.25);
+            border-color: rgba(142, 45, 226, 0.9);
+            background-color: rgba(30, 15, 60, 0.95);
+            box-shadow: 0 0 0 3px rgba(142, 45, 226, 0.3);
         }
         
         .format-select option {
-            background-color: rgba(0, 0, 0, 0.9);
+            background-color: rgba(20, 10, 40, 0.95);
             color: white;
+            padding: 10px;
         }
         
-        /* 设置区域 */
+        /* 设置区域 - 提高辨识度 */
         .settings-options {
-            background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background-color: rgba(30, 30, 50, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border-radius: 15px;
-            padding: 20px;
+            padding: 25px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(235, 54, 120, 0.5);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
         .settings-summary {
-            color: white;
-            font-weight: 500;
-            font-size: 16px;
+            color: #ffd9e6;
+            font-weight: 600;
+            font-size: 18px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 10px 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         }
         
         .settings-summary::after {
             content: "▼";
-            font-size: 12px;
+            font-size: 14px;
             transition: transform 0.3s ease;
+            color: #ff69b4;
         }
         
         .settings-options[open] .settings-summary::after {
@@ -292,12 +301,16 @@
         }
         
         .settings-content {
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
         }
         
         .sub-settings {
             margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            background-color: rgba(40, 30, 60, 0.5);
         }
         
         .sub-settings:last-child {
@@ -305,9 +318,9 @@
         }
         
         .sub-summary {
-            color: white;
-            font-weight: 500;
-            font-size: 15px;
+            color: #e6ccff;
+            font-weight: 600;
+            font-size: 16px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
@@ -317,8 +330,9 @@
         
         .sub-summary::after {
             content: "▼";
-            font-size: 10px;
+            font-size: 12px;
             transition: transform 0.3s ease;
+            color: #8e2de2;
         }
         
         .sub-settings[open] .sub-summary::after {
@@ -326,13 +340,21 @@
         }
         
         .sub-content {
-            padding: 10px 0 0 15px;
+            padding: 15px 0 0 15px;
         }
         
         .setting-item {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+            transition: background-color 0.2s ease;
+        }
+        
+        .setting-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
         
         .setting-item:last-child {
@@ -340,35 +362,38 @@
         }
         
         .setting-item label {
-            color: white;
-            font-weight: 400;
-            font-size: 14px;
-            margin-left: 8px;
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 15px;
+            margin-left: 12px;
             cursor: pointer;
+            flex: 1;
         }
         
         .setting-checkbox {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
             accent-color: #8e2de2;
+            border-radius: 4px;
         }
         
         /* 质量滑块区域 */
         .quality-option {
             display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background-color: rgba(255, 255, 255, 0.05);
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(30, 15, 60, 0.7);
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(106, 17, 203, 0.5);
         }
         
         .quality-label {
             display: block;
-            color: white;
-            margin-bottom: 12px;
-            font-weight: 500;
+            color: #e6ccff;
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 16px;
         }
         
         .quality-slider-container {
@@ -381,10 +406,10 @@
         #quality-range {
             flex: 1;
             max-width: 200px;
-            height: 8px;
+            height: 10px;
             -webkit-appearance: none;
             appearance: none;
-            background: rgba(255, 255, 255, 0.15);
+            background: linear-gradient(to right, #4f1787, #8e2de2);
             border-radius: 10px;
             outline: none;
             backdrop-filter: blur(5px);
@@ -394,35 +419,38 @@
         #quality-range::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             cursor: pointer;
-            border: 2px solid rgba(142, 45, 226, 0.8);
+            border: 3px solid rgba(142, 45, 226, 0.9);
+            box-shadow: 0 0 10px rgba(142, 45, 226, 0.7);
         }
         
         #quality-range::-moz-range-thumb {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             cursor: pointer;
-            border: 2px solid rgba(142, 45, 226, 0.8);
+            border: 3px solid rgba(142, 45, 226, 0.9);
+            box-shadow: 0 0 10px rgba(142, 45, 226, 0.7);
         }
         
         #quality-value {
             display: inline-block;
-            width: 45px;
+            width: 50px;
             text-align: center;
             font-weight: bold;
-            font-size: 17px;
+            font-size: 18px;
             color: white;
-            background-color: rgba(142, 45, 226, 0.6);
-            padding: 7px 12px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #8e2de2, #4f1787);
+            padding: 8px 15px;
+            border-radius: 10px;
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         
         .loader {
@@ -500,14 +528,6 @@
                 gap: 8px;
             }
             
-            .title-icon {
-                height: 1.5rem;
-            }
-            
-            .title-icons {
-                gap: 6px;
-            }
-            
             .image-container {
                 width: min(300px, 80vw, 80vh);
                 height: min(300px, 80vw, 80vh);
@@ -561,14 +581,6 @@
             h1 {
                 font-size: 1.4rem;
             }
-            
-            .title-icon {
-                height: 1.4rem;
-            }
-            
-            .title-icons {
-                gap: 5px;
-            }
         }
     </style>
 </head>
@@ -581,13 +593,7 @@
     </div>
     
     <div class="content" id="content">
-        <h1>
-            星光_图片混淆TOOL
-            <div class="title-icons">
-                <img src="https://github.com/Gascy37/grimage.encryption/image/Gascy.png" alt="Gascy" class="title-icon">
-                <img src="https://github.com/Gascy37/grimage.encryption/image/ctn.png" alt="ctn" class="title-icon">
-            </div>
-        </h1>
+        <h1>星光_图片混淆TOOL</h1>
         
         <div class="image-container">
             <img id="display-img" />
