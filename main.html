@@ -1,0 +1,2419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星光_图片混淆TOOL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            min-height: 100vh;
+            background: 
+                linear-gradient(135deg, #000000 0%, transparent 50%, #87ceeb 100%),
+                linear-gradient(225deg, #ffc0cb 0%, transparent 50%, #ffffff 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            background-attachment: fixed;
+            position: relative;
+        }
+        
+        .content {
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #ff69b4;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            text-align: left;
+            font-weight: 600;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.7), 0 0 20px rgba(255, 105, 180, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 105, 180, 0.7), 0 0 20px rgba(255, 105, 180, 0.5);
+            }
+            to {
+                text-shadow: 0 0 15px rgba(255, 105, 180, 0.9), 0 0 25px rgba(255, 105, 180, 0.7), 0 0 35px rgba(255, 105, 180, 0.5);
+            }
+        }
+        
+        .image-container {
+            width: min(400px, 80vw, 80vh);
+            height: min(400px, 80vw, 80vh);
+            margin: 0 auto 25px;
+            position: relative;
+            background-color: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        #display-img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+            object-fit: contain;
+        }
+        
+        .file-selector {
+            background-color: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .file-button {
+            background-color: rgba(106, 17, 203, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: white;
+            width: 200px;
+            height: 55px;
+            border-radius: 12px;
+            position: relative;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            font-weight: 600;
+            font-size: 17px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .file-button:hover {
+            background-color: rgba(106, 17, 203, 0.7);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(106, 17, 203, 0.4), 0 0 20px rgba(106, 17, 203, 0.3);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .file-button:active {
+            background-color: rgba(106, 17, 203, 0.5);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(106, 17, 203, 0.3);
+        }
+        
+        .file-button span {
+            line-height: 55px;
+            display: block;
+            color: #ffffff;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .ipt_btn {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .action-button-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .button-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-button {
+            height: 60px;
+            padding: 0 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .action-button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .action-button.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .action-button.disabled:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        #enc {
+            background-color: rgba(30, 144, 255, 0.4);
+            color: #d9e6ff;
+        }
+        
+        #enc:hover:not(.disabled) {
+            background-color: rgba(30, 144, 255, 0.7);
+            box-shadow: 0 8px 15px rgba(30, 144, 255, 0.4), 0 0 20px rgba(30, 144, 255, 0.3);
+        }
+        
+        #enc:active:not(.disabled) {
+            background-color: rgba(30, 144, 255, 0.5);
+            box-shadow: 0 4px 8px rgba(30, 144, 255, 0.3);
+        }
+        
+        #dec {
+            background-color: rgba(220, 20, 60, 0.4);
+            color: #ffd9e6;
+        }
+        
+        #dec:hover:not(.disabled) {
+            background-color: rgba(220, 20, 60, 0.7);
+            box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4), 0 0 20px rgba(220, 20, 60, 0.3);
+        }
+        
+        #dec:active:not(.disabled) {
+            background-color: rgba(220, 20, 60, 0.5);
+            box-shadow: 0 4px 8px rgba(220, 20, 60, 0.3);
+        }
+        
+        #re {
+            background-color: rgba(255, 140, 0, 0.4);
+            color: #ffe6d9;
+            display: none;
+        }
+        
+        #re:hover:not(.disabled) {
+            background-color: rgba(255, 140, 0, 0.7);
+            box-shadow: 0 8px 15px rgba(255, 140, 0, 0.4), 0 0 20px rgba(255, 140, 0, 0.3);
+        }
+        
+        #re:active:not(.disabled) {
+            background-color: rgba(255, 140, 0, 0.5);
+            box-shadow: 0 4px 8px rgba(255, 140, 0, 0.3);
+        }
+        
+        #clear {
+            background-color: rgba(50, 205, 50, 0.4);
+            color: #d9ffe6;
+            display: none;
+        }
+        
+        #clear:hover:not(.disabled) {
+            background-color: rgba(50, 205, 50, 0.7);
+            box-shadow: 0 8px 15px rgba(50, 205, 50, 0.4), 0 0 20px rgba(50, 205, 50, 0.3);
+        }
+        
+        #clear:active:not(.disabled) {
+            background-color: rgba(50, 205, 50, 0.5);
+            box-shadow: 0 4px 8px rgba(50, 205, 50, 0.3);
+        }
+        
+        #download {
+            background-color: rgba(0, 191, 255, 0.4);
+            color: #e6f7ff;
+            display: none;
+        }
+        
+        #download:hover:not(.disabled) {
+            background-color: rgba(0, 191, 255, 0.7);
+            box-shadow: 0 8px 15px rgba(0, 191, 255, 0.4), 0 0 20px rgba(0, 191, 255, 0.3);
+        }
+        
+        #download:active:not(.disabled) {
+            background-color: rgba(0, 191, 255, 0.5);
+            box-shadow: 0 4px 8px rgba(0, 191, 255, 0.3);
+        }
+        
+        .circle-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .circle-button:hover:not(.disabled) {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .circle-button:active:not(.disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .circle-button.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .circle-button.disabled:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        #enc-multiple {
+            background-color: rgba(30, 144, 255, 0.4);
+            color: #d9e6ff;
+        }
+        
+        #enc-multiple:hover:not(.disabled) {
+            background-color: rgba(30, 144, 255, 0.7);
+            box-shadow: 0 8px 15px rgba(30, 144, 255, 0.4), 0 0 20px rgba(30, 144, 255, 0.3);
+        }
+        
+        #enc-multiple:active:not(.disabled) {
+            background-color: rgba(30, 144, 255, 0.5);
+            box-shadow: 0 4px 8px rgba(30, 144, 255, 0.3);
+        }
+        
+        #dec-multiple {
+            background-color: rgba(220, 20, 60, 0.4);
+            color: #ffd9e6;
+        }
+        
+        #dec-multiple:hover:not(.disabled) {
+            background-color: rgba(220, 20, 60, 0.7);
+            box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4), 0 0 20px rgba(220, 20, 60, 0.3);
+        }
+        
+        #dec-multiple:active:not(.disabled) {
+            background-color: rgba(220, 20, 60, 0.5);
+            box-shadow: 0 4px 8px rgba(220, 20, 60, 0.3);
+        }
+        
+        .format-options {
+            background-color: rgba(30, 30, 50, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid rgba(142, 45, 226, 0.5);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .format-options label {
+            color: #e6ccff;
+            font-weight: 600;
+            font-size: 17px;
+            margin-right: 10px;
+            display: inline-block;
+            margin-bottom: 15px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .format-select {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(106, 17, 203, 0.7);
+            background-color: rgba(20, 10, 40, 0.9);
+            font-size: 16px;
+            color: #ffffff;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .format-select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .format-select:focus {
+            outline: none;
+            border-color: rgba(142, 45, 226, 0.9);
+            background-color: rgba(30, 15, 60, 0.95);
+            box-shadow: 0 0 0 3px rgba(142, 45, 226, 0.3);
+        }
+        
+        .format-select option {
+            background-color: rgba(20, 10, 40, 0.95);
+            color: white;
+            padding: 10px;
+        }
+        
+        .settings-options {
+            background-color: rgba(30, 30, 50, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid rgba(235, 54, 120, 0.5);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .settings-summary {
+            color: #ffd9e6;
+            font-weight: 600;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .settings-summary::after {
+            content: "▼";
+            font-size: 14px;
+            transition: transform 0.3s ease;
+            color: #ff69b4;
+        }
+        
+        .settings-options[open] .settings-summary::after {
+            transform: rotate(180deg);
+        }
+        
+        .settings-content {
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .sub-settings {
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            background-color: rgba(40, 30, 60, 0.5);
+        }
+        
+        .sub-settings:last-child {
+            margin-bottom: 0;
+        }
+        
+        .sub-summary {
+            color: #e6ccff;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .sub-summary::after {
+            content: "▼";
+            font-size: 12px;
+            transition: transform 0.3s ease;
+            color: #8e2de2;
+        }
+        
+        .sub-settings[open] .sub-summary::after {
+            transform: rotate(180deg);
+        }
+        
+        .sub-content {
+            padding: 15px 0 0 15px;
+        }
+        
+        .setting-item {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+            transition: background-color 0.2s ease;
+        }
+        
+        .setting-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .setting-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .setting-item label {
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 15px;
+            margin-left: 12px;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .setting-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #8e2de2;
+            border-radius: 4px;
+        }
+        
+        .quality-option {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(30, 15, 60, 0.7);
+            border-radius: 12px;
+            border: 1px solid rgba(106, 17, 203, 0.5);
+        }
+        
+        .quality-label {
+            display: block;
+            color: #e6ccff;
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .quality-slider-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        #quality-range {
+            flex: 1;
+            max-width: 200px;
+            height: 10px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #4f1787, #8e2de2);
+            border-radius: 10px;
+            outline: none;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        #quality-range:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        #quality-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            cursor: pointer;
+            border: 3px solid rgba(142, 45, 226, 0.9);
+            box-shadow: 0 0 10px rgba(142, 45, 226, 0.7);
+        }
+        
+        #quality-range:disabled::-webkit-slider-thumb {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        #quality-range::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            cursor: pointer;
+            border: 3px solid rgba(142, 45, 226, 0.9);
+            box-shadow: 0 0 10px rgba(142, 45, 226, 0.7);
+        }
+        
+        #quality-range:disabled::-moz-range-thumb {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        #quality-value {
+            display: inline-block;
+            width: 50px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+            background: linear-gradient(135deg, #8e2de2, #4f1787);
+            padding: 8px 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 1000;
+            width: 400px;
+            height: 400px;
+        }
+        
+        .loader::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(51, 153, 255, 0.9) 0%, rgba(51, 153, 255, 0.4) 30%, rgba(51, 153, 255, 0) 70%);
+            transform: translate(-50%, -50%);
+            animation: blue-pulse 2.5s ease-in-out infinite;
+            z-index: -1;
+            box-shadow: 0 0 200px 100px rgba(51, 153, 255, 0.3);
+        }
+        
+        .loader div {
+            border-width: 8px;
+            border-style: solid;
+            border-left-color: transparent;
+            border-right-color: transparent;
+            border-top-color: transparent;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            position: absolute;
+            animation: spin 2s ease infinite;
+        }
+        
+        .loader div:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            left: 50px;
+            top: 50px;
+            border-left-color: #8A2BE2; /* 紫色 */
+            border-right-color: #8A2BE2;
+            animation-delay: 0s;
+        }
+        
+        .loader div:nth-child(2) {
+            width: 260px;
+            height: 260px;
+            left: 70px;
+            top: 70px;
+            border-left-color: #00CED1; /* 青色 */
+            border-right-color: #00CED1;
+            animation-delay: 0.1s;
+        }
+        
+        .loader div:nth-child(3) {
+            width: 220px;
+            height: 220px;
+            left: 90px;
+            top: 90px;
+            border-left-color: #FF1493; /* 深粉色 */
+            border-right-color: #FF1493;
+            animation-delay: 0.2s;
+        }
+        
+        .loader div:nth-child(4) {
+            width: 180px;
+            height: 180px;
+            left: 110px;
+            top: 110px;
+            border-left-color: #FF8C00; /* 深橙色 */
+            border-right-color: #FF8C00;
+            animation-delay: 0.3s;
+        }
+        
+        @keyframes spin {
+            50% {
+                transform: rotate(180deg);
+            }
+            100% {
+                transform: rotate(0);
+            }
+        }
+        
+        @keyframes blue-pulse {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0;
+                box-shadow: 0 0 0 0 rgba(51, 153, 255, 0);
+            }
+            15% {
+                width: 300vw;
+                height: 300vw;
+                opacity: 0.8;
+                box-shadow: 0 0 200px 100px rgba(51, 153, 255, 0.5);
+            }
+            30% {
+                width: 0;
+                height: 0;
+                opacity: 0;
+                box-shadow: 0 0 0 0 rgba(51, 153, 255, 0);
+            }
+            45% {
+                width: 300vw;
+                height: 300vw;
+                opacity: 0.6;
+                box-shadow: 0 0 150px 80px rgba(51, 153, 255, 0.4);
+            }
+            60% {
+                width: 0;
+                height: 0;
+                opacity: 0;
+                box-shadow: 0 0 0 0 rgba(51, 153, 255, 0);
+            }
+            75% {
+                width: 300vw;
+                height: 300vw;
+                opacity: 0.4;
+                box-shadow: 0 0 100px 60px rgba(51, 153, 255, 0.3);
+            }
+            90% {
+                width: 0;
+                height: 0;
+                opacity: 0;
+                box-shadow: 0 0 0 0 rgba(51, 153, 255, 0);
+            }
+            100% {
+                width: 0;
+                height: 0;
+                opacity: 0;
+                box-shadow: 0 0 0 0 rgba(51, 153, 255, 0);
+            }
+        }
+        
+        .file-button .wave,
+        .action-button .wave,
+        .circle-button .wave,
+        .copy-button .wave,
+        .clear-errors-button .wave {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            animation: animate 0.8s ease-out;
+            z-index: 1;
+            box-shadow: 0 0 10px currentColor;
+        }
+        
+        @keyframes animate {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0.9;
+            }
+            70% {
+                opacity: 0.5;
+            }
+            100% {
+                width: 400px;
+                height: 400px;
+                opacity: 0;
+            }
+        }
+        
+        .error-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        
+        .error-window {
+            background-color: rgba(40, 40, 60, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid rgba(220, 20, 60, 0.7);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+        
+        .error-header {
+            background-color: rgba(220, 20, 60, 0.8);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .error-title {
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .error-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .error-close:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .error-close:active {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(0.95);
+        }
+        
+        .error-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            color: #ff6b6b;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .error-divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin: 10px 0;
+        }
+        
+        .error-controls {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            background-color: rgba(30, 30, 50, 0.8);
+        }
+        
+        .copy-button {
+            background-color: rgba(30, 144, 255, 0.6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .copy-button:hover {
+            background-color: rgba(30, 144, 255, 0.8);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 12px rgba(30, 144, 255, 0.3);
+        }
+        
+        .copy-button:active {
+            background-color: rgba(30, 144, 255, 0.7);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(30, 144, 255, 0.2);
+        }
+        
+        .clear-errors-button {
+            background-color: rgba(255, 140, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .clear-errors-button:hover {
+            background-color: rgba(255, 140, 0, 0.8);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 12px rgba(255, 140, 0, 0.3);
+        }
+        
+        .clear-errors-button:active {
+            background-color: rgba(255, 140, 0, 0.7);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(255, 140, 0, 0.2);
+        }
+        
+        .error-buttons-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            .content {
+                padding: 15px;
+                max-width: 100%;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+                gap: 8px;
+            }
+            
+            .image-container {
+                width: min(300px, 80vw, 80vh);
+                height: min(300px, 80vw, 80vh);
+                margin-bottom: 20px;
+            }
+            
+            .file-selector, .format-options, .settings-options {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .file-button {
+                width: 180px;
+                height: 50px;
+            }
+            
+            .file-button span {
+                line-height: 50px;
+                font-size: 16px;
+            }
+            
+            .action-button {
+                height: 55px;
+                min-width: 100px;
+                padding: 0 15px;
+                font-size: 16px;
+            }
+            
+            .circle-button {
+                width: 55px;
+                height: 55px;
+                font-size: 20px;
+            }
+            
+            .action-button-row {
+                gap: 8px;
+            }
+            
+            .button-group {
+                gap: 6px;
+            }
+            
+            .loader {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .loader div:nth-child(1) {
+                width: 230px;
+                height: 230px;
+                left: 35px;
+                top: 35px;
+            }
+            
+            .loader div:nth-child(2) {
+                width: 200px;
+                height: 200px;
+                left: 50px;
+                top: 50px;
+            }
+            
+            .loader div:nth-child(3) {
+                width: 170px;
+                height: 170px;
+                left: 65px;
+                top: 65px;
+            }
+            
+            .loader div:nth-child(4) {
+                width: 140px;
+                height: 140px;
+                left: 80px;
+                top: 80px;
+            }
+            
+            .error-window {
+                width: 95%;
+                max-height: 70vh;
+            }
+            
+            .error-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .error-buttons-container {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .clear-errors-button,
+            .copy-button {
+                flex: 1;
+                padding: 12px 10px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .action-button-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+            }
+            
+            .button-group {
+                width: 100%;
+                max-width: 250px;
+                justify-content: center;
+            }
+            
+            .action-button {
+                width: 100%;
+                max-width: 180px;
+            }
+            
+            .circle-button {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .image-container {
+                width: min(250px, 80vw, 80vh);
+                height: min(250px, 80vw, 80vh);
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+            }
+            
+            .loader {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .loader div:nth-child(1) {
+                width: 180px;
+                height: 180px;
+                left: 35px;
+                top: 35px;
+            }
+            
+            .loader div:nth-child(2) {
+                width: 160px;
+                height: 160px;
+                left: 45px;
+                top: 45px;
+            }
+            
+            .loader div:nth-child(3) {
+                width: 140px;
+                height: 140px;
+                left: 55px;
+                top: 55px;
+            }
+            
+            .loader div:nth-child(4) {
+                width: 120px;
+                height: 120px;
+                left: 65px;
+                top: 65px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-overlay" id="error-overlay">
+        <div class="error-window">
+            <div class="error-header">
+                <div class="error-title">错误信息</div>
+                <button class="error-close" id="error-close">&times;</button>
+            </div>
+            <div class="error-content" id="error-content">
+            </div>
+            <div class="error-controls">
+                <div class="error-buttons-container">
+                    <button class="clear-errors-button" id="clear-errors">清除所有记录</button>
+                    <button class="copy-button" id="copy-errors">复制所有错误</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="loader" id="loader">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    
+    <div class="content" id="content">
+        <h1>星光_图片混淆TOOL</h1>
+        
+        <div class="image-container">
+            <img id="display-img" />
+        </div>
+        
+        <div class="file-selector">
+            <div class="file-button">
+                <span>选择图片</span>
+                <input type="file" accept="image/*" id="ipt" class="ipt_btn" />
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <div class="action-button-row">
+                <div class="button-group">
+                    <button id="enc" class="action-button">混淆图片</button>
+                    <button id="enc-multiple" class="circle-button">+</button>
+                </div>
+                <div class="button-group">
+                    <button id="dec" class="action-button">解混淆</button>
+                    <button id="dec-multiple" class="circle-button">-</button>
+                </div>
+            </div>
+            <div class="action-button-row">
+                <button id="re" class="action-button" style="min-width: 200px;">还原原图</button>
+            </div>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-bottom: 15px; gap: 10px;">
+            <button id="download" class="action-button" style="min-width: 200px;">下载图片</button>
+            <button id="clear" class="action-button" style="min-width: 200px;">清除图片</button>
+        </div>
+        
+        <div class="format-options">
+            <label for="format-select">输出格式:</label>
+            <select id="format-select" class="format-select">
+                <option value="png" selected>PNG (无损)</option>
+                <option value="jpg">JPG (有损)</option>
+            </select>
+            
+            <div id="quality-option" class="quality-option">
+                <div class="quality-label">图片质量:</div>
+                <div class="quality-slider-container">
+                    <input type="range" id="quality-range" min="10" max="100" value="95">
+                    <span id="quality-value">95</span>
+                </div>
+            </div>
+        </div>
+        
+        <details class="settings-options" id="settings-options">
+            <summary class="settings-summary">设置</summary>
+            <div class="settings-content">
+                <details class="sub-settings">
+                    <summary class="sub-summary">混淆设置</summary>
+                    <div class="sub-content">
+                        <div class="setting-item">
+                            <input type="checkbox" id="enable-green" class="setting-checkbox">
+                            <label for="enable-green">绿图 (增强绿色80%)</label>
+                        </div>
+                    </div>
+                </details>
+                
+                <details class="sub-settings">
+                    <summary class="sub-summary">解混淆设置</summary>
+                    <div class="sub-content">
+                        <div class="setting-item">
+                            <input type="checkbox" id="reduce-green" class="setting-checkbox">
+                            <label for="reduce-green">减弱绿色效果</label>
+                        </div>
+                    </div>
+                </details>
+                
+                <details class="sub-settings">
+                    <summary class="sub-summary">兼容设置</summary>
+                    <div class="sub-content">
+                        <div class="setting-item">
+                            <input type="checkbox" id="enable-tomato-compatibility" class="setting-checkbox">
+                            <label for="enable-tomato-compatibility">兼容小番茄混淆处理</label>
+                        </div>
+                    </div>
+                </details>
+                
+                <details class="sub-settings">
+                    <summary class="sub-summary">开发者设置</summary>
+                    <div class="sub-content">
+                        <div class="setting-item">
+                            <input type="checkbox" id="show-errors" class="setting-checkbox">
+                            <label for="show-errors">弹出报错信息</label>
+                        </div>
+                        <div class="setting-item">
+                            <button id="open-error-window" class="action-button" style="width: 100%; padding: 10px; font-size: 14px; margin-top: 10px; background-color: rgba(106, 17, 203, 0.4);">手动打开错误窗口</button>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </details>
+    </div>
+    
+<script>
+function gilbert2dRecursive(width, height) {
+    const coordinates = [];
+
+    if (width >= height) {
+        generate2d(0, 0, width, 0, 0, height, coordinates);
+    } else {
+        generate2d(0, 0, 0, height, width, 0, coordinates);
+    }
+
+    return coordinates;
+}
+
+function generate2d(x, y, ax, ay, bx, by, coordinates) {
+    const w = Math.abs(ax + ay);
+    const h = Math.abs(bx + by);
+
+    const dax = Math.sign(ax), day = Math.sign(ay);
+    const dbx = Math.sign(bx), dby = Math.sign(by);
+
+    if (h === 1) {
+        for (let i = 0; i < w; i++) {
+            coordinates.push([x, y]);
+            x += dax;
+            y += day;
+        }
+        return;
+    }
+
+    if (w === 1) {
+        for (let i = 0; i < h; i++) {
+            coordinates.push([x, y]);
+            x += dbx;
+            y += dby;
+        }
+        return;
+    }
+
+    let ax2 = Math.floor(ax / 2), ay2 = Math.floor(ay / 2);
+    let bx2 = Math.floor(bx / 2), by2 = Math.floor(by / 2);
+
+    const w2 = Math.abs(ax2 + ay2);
+    const h2 = Math.abs(bx2 + by2);
+
+    if (2 * w > 3 * h) {
+        if ((w2 % 2) && (w > 2)) {
+            ax2 += dax;
+            ay2 += day;
+        }
+
+        generate2d(x, y, ax2, ay2, bx, by, coordinates);
+        generate2d(x + ax2, y + ay2, ax - ax2, ay - ay2, bx, by, coordinates);
+
+    } else {
+        if ((h2 % 2) && (h > 2)) {
+            bx2 += dbx;
+            by2 += dby;
+        }
+
+        generate2d(x, y, bx2, by2, ax2, ay2, coordinates);
+        generate2d(x + bx2, y + by2, ax, ay, bx - bx2, by - by2, coordinates);
+        generate2d(x + (ax - dax) + (bx2 - dbx), y + (ay - day) + (by2 - dby),
+            -bx2, -by2, -(ax - ax2), -(ay - ay2), coordinates);
+    }
+}
+
+function gilbert2dIterative(width, height) {
+    const coordinates = [];
+    
+    const stack = [];
+    
+    if (width >= height) {
+        stack.push({x: 0, y: 0, ax: width, ay: 0, bx: 0, by: height});
+    } else {
+        stack.push({x: 0, y: 0, ax: 0, ay: height, bx: width, by: 0});
+    }
+    
+    while (stack.length > 0) {
+        const {x, y, ax, ay, bx, by} = stack.pop();
+        
+        const w = Math.abs(ax + ay);
+        const h = Math.abs(bx + by);
+        
+        const dax = Math.sign(ax), day = Math.sign(ay);
+        const dbx = Math.sign(bx), dby = Math.sign(by);
+        
+        if (h === 1) {
+            let curX = x, curY = y;
+            for (let i = 0; i < w; i++) {
+                coordinates.push([curX, curY]);
+                curX += dax;
+                curY += day;
+            }
+            continue;
+        }
+        
+        if (w === 1) {
+            let curX = x, curY = y;
+            for (let i = 0; i < h; i++) {
+                coordinates.push([curX, curY]);
+                curX += dbx;
+                curY += dby;
+            }
+            continue;
+        }
+        
+        let ax2 = Math.floor(ax / 2), ay2 = Math.floor(ay / 2);
+        let bx2 = Math.floor(bx / 2), by2 = Math.floor(by / 2);
+        
+        const w2 = Math.abs(ax2 + ay2);
+        const h2 = Math.abs(bx2 + by2);
+        
+        if (2 * w > 3 * h) {
+            if ((w2 % 2) && (w > 2)) {
+                ax2 += dax;
+                ay2 += day;
+            }
+            
+            stack.push({x: x + ax2, y: y + ay2, ax: ax - ax2, ay: ay - ay2, bx, by});
+            stack.push({x, y, ax: ax2, ay: ay2, bx, by});
+        } else {
+            if ((h2 % 2) && (h > 2)) {
+                bx2 += dbx;
+                by2 += dby;
+            }
+            
+            stack.push({x: x + (ax - dax) + (bx2 - dbx), y: y + (ay - day) + (by2 - dby),
+                ax: -bx2, ay: -by2, bx: -(ax - ax2), by: -(ay - ay2)});
+            stack.push({x: x + bx2, y: y + by2, ax, ay, bx: bx - bx2, by: by - by2});
+            stack.push({x, y, ax: bx2, ay: by2, bx: ax2, by: ay2});
+        }
+    }
+    
+    return coordinates;
+}
+</script>
+<script>
+const img = document.getElementById("display-img");
+const loader = document.getElementById("loader");
+const encBtn = document.getElementById("enc");
+const decBtn = document.getElementById("dec");
+const encMultipleBtn = document.getElementById("enc-multiple");
+const decMultipleBtn = document.getElementById("dec-multiple");
+const restoreBtn = document.getElementById("re");
+const clearBtn = document.getElementById("clear");
+const downloadBtn = document.getElementById("download");
+const formatSelect = document.getElementById("format-select");
+const qualityOption = document.getElementById("quality-option");
+const qualityRange = document.getElementById("quality-range");
+const qualityValue = document.getElementById("quality-value");
+
+const enableGreen = document.getElementById("enable-green");
+const reduceGreen = document.getElementById("reduce-green");
+const showErrors = document.getElementById("show-errors");
+const openErrorWindowBtn = document.getElementById("open-error-window");
+const enableTomatoCompatibility = document.getElementById("enable-tomato-compatibility");
+
+const errorOverlay = document.getElementById("error-overlay");
+const errorContent = document.getElementById("error-content");
+const errorClose = document.getElementById("error-close");
+const copyErrorsBtn = document.getElementById("copy-errors");
+const clearErrorsBtn = document.getElementById("clear-errors");
+
+let errorMessages = [];
+let errorDebounceTimer = null;
+
+let hasEncrypted = false;
+let hasDecrypted = false;
+let hasProcessed = false;
+let hasImage = false;
+let currentFileName = "";
+
+let currentBlobURLs = [];
+
+let largeObjects = {
+    canvas: null,
+    imgData: null,
+    curve: null
+};
+
+// 并发控制：防止快速连续点击导致多个操作同时进行
+let isProcessing = false;
+
+function debounce(func, wait) {
+    return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(errorDebounceTimer);
+        errorDebounceTimer = setTimeout(() => {
+            func.apply(context, args);
+        }, wait);
+    };
+}
+
+function showError(message) {
+    if (typeof message !== 'string') {
+        message = String(message);
+    }
+    
+    if (message.includes('showError') && message.includes('递归')) {
+        console.error('防止递归调用:', message);
+        return;
+    }
+    
+    try {
+        const timestamp = new Date().toLocaleTimeString();
+        const errorMessage = `[${timestamp}] ${message}`;
+        
+        if (errorMessages.length > 100) {
+            errorMessages.shift();
+        }
+        
+        errorMessages.push(errorMessage);
+        
+        safeUpdateErrorDisplay();
+        
+        if (showErrors && showErrors.checked) {
+            setTimeout(() => {
+                try {
+                    errorOverlay.style.display = "flex";
+                } catch (e) {
+                    console.error('显示错误窗口失败:', e);
+                }
+            }, 0);
+        }
+        
+        console.error(errorMessage);
+    } catch (error) {
+        console.error('showError函数出错:', error.message);
+    }
+}
+
+function safeUpdateErrorDisplay() {
+    try {
+        let html = "";
+        const maxErrors = 50;
+        const startIndex = Math.max(0, errorMessages.length - maxErrors);
+        
+        for (let i = startIndex; i < errorMessages.length; i++) {
+            html += errorMessages[i];
+            if (i < errorMessages.length - 1) {
+                html += '\n<div class="error-divider"></div>\n';
+            }
+        }
+        errorContent.innerHTML = html;
+    } catch (error) {
+        console.error('更新错误显示失败:', error);
+    }
+}
+
+function clearAllErrors() {
+    errorMessages = [];
+    safeUpdateErrorDisplay();
+    console.log('所有错误记录已清除');
+}
+
+function copyAllErrors() {
+    try {
+        const allErrors = errorMessages.join('\n');
+        navigator.clipboard.writeText(allErrors).then(() => {
+            console.log('错误信息已复制到剪贴板');
+        }).catch(err => {
+            console.error('复制失败:', err);
+            showError('复制失败: ' + err.message);
+        });
+    } catch (error) {
+        showError('复制错误时出错: ' + error.message);
+    }
+}
+
+function closeErrorWindow() {
+    try {
+        errorOverlay.style.display = "none";
+    } catch (error) {
+        console.error('关闭错误窗口失败:', error);
+    }
+}
+
+function openErrorWindow() {
+    try {
+        errorOverlay.style.display = "flex";
+    } catch (error) {
+        showError('打开错误窗口时出错: ' + error.message);
+    }
+}
+
+try {
+    errorClose.addEventListener('click', closeErrorWindow);
+    copyErrorsBtn.addEventListener('click', copyAllErrors);
+    clearErrorsBtn.addEventListener('click', clearAllErrors);
+    if (openErrorWindowBtn) {
+        openErrorWindowBtn.addEventListener('click', openErrorWindow);
+    }
+} catch (error) {
+    console.error('初始化错误窗口事件失败:', error);
+}
+
+window.addEventListener('error', function(event) {
+    event.preventDefault();
+    const errorMsg = event.error ? event.error.toString() : event.message;
+    showError('全局错误: ' + errorMsg);
+    return true;
+});
+
+window.addEventListener('unhandledrejection', function(event) {
+    event.preventDefault();
+    const errorMsg = event.reason ? event.reason.toString() : '未处理的Promise拒绝';
+    showError('未处理的Promise拒绝: ' + errorMsg);
+    return true;
+});
+
+function releaseAllBlobURLs() {
+    try {
+        currentBlobURLs.forEach(url => {
+            if (url && url.startsWith('blob:')) {
+                try {
+                    URL.revokeObjectURL(url);
+                } catch (e) {
+                    console.warn('释放blob URL失败:', e);
+                }
+            }
+        });
+        currentBlobURLs = [];
+    } catch (error) {
+        console.error('释放blob URL时出错:', error);
+    }
+}
+
+function releaseLargeObjects() {
+    try {
+        // 释放canvas资源
+        if (largeObjects.canvas) {
+            const ctx = largeObjects.canvas.getContext('2d');
+            if (ctx) {
+                // 清除canvas内容
+                ctx.clearRect(0, 0, largeObjects.canvas.width, largeObjects.canvas.height);
+                // 释放ImageData资源
+                if (largeObjects.imgData) {
+                    // 创建空的ImageData来替换原来的数据
+                    ctx.putImageData(new ImageData(largeObjects.canvas.width, largeObjects.canvas.height), 0, 0);
+                }
+            }
+            
+            // 移除canvas元素
+            if (largeObjects.canvas.parentNode) {
+                largeObjects.canvas.parentNode.removeChild(largeObjects.canvas);
+            }
+            
+            // 显式设置canvas尺寸为0
+            largeObjects.canvas.width = 0;
+            largeObjects.canvas.height = 0;
+            
+            // 移除所有事件监听器
+            const newCanvas = largeObjects.canvas.cloneNode(false);
+            largeObjects.canvas = null;
+            
+            // 如果浏览器支持，手动触发垃圾回收提示
+            if (typeof window.gc === 'function') {
+                try {
+                    window.gc();
+                } catch (e) {
+                    // 忽略gc错误
+                }
+            }
+        }
+        
+        // 释放ImageData资源
+        largeObjects.imgData = null;
+        
+        // 释放曲线数据
+        largeObjects.curve = null;
+        
+        // 强制垃圾回收提示（非标准方法，仅用于调试）
+        try {
+            if (window.CollectGarbage) {
+                window.CollectGarbage();
+            }
+        } catch (e) {
+            // 忽略错误
+        }
+        
+        // 使用requestAnimationFrame给浏览器时间进行垃圾回收
+        requestAnimationFrame(() => {
+            // 可以尝试分配和释放一些内存来提示垃圾回收器
+            const temp = new Array(1000).fill(0);
+            setTimeout(() => {
+                // 空操作，只是给垃圾回收器时间
+            }, 0);
+        });
+        
+    } catch (error) {
+        console.error('释放大对象时出错:', error);
+        // 即使出错也继续重置变量
+        largeObjects.canvas = null;
+        largeObjects.imgData = null;
+        largeObjects.curve = null;
+    }
+}
+
+function setImageSrc(src) {
+    try {
+        img.onerror = null;
+        img.onload = null;
+        
+        if (!src) {
+            img.style.display = "none";
+            img.src = "";
+            return;
+        }
+        
+        releaseAllBlobURLs();
+        
+        if (src && src.startsWith('blob:')) {
+            currentBlobURLs.push(src);
+        }
+        
+        img.onerror = function() {
+            if (src && src !== '') {
+                const srcPreview = src.length > 100 ? src.substring(0, 100) + '...' : src;
+                showError('图片加载失败: ' + srcPreview);
+            }
+        };
+        
+        img.onload = function() {
+            img.style.display = "block";
+        };
+        
+        img.src = src;
+        
+    } catch (error) {
+        showError('设置图片源时出错: ' + error.message);
+    }
+}
+
+function showLoader() {
+    try {
+        loader.style.display = "block";
+    } catch (error) {
+        console.error('显示加载动画失败:', error);
+    }
+}
+
+function hideLoader() {
+    try {
+        loader.style.display = "none";
+    } catch (error) {
+        console.error('隐藏加载动画失败:', error);
+    }
+}
+
+function resetButtonStates() {
+    try {
+        hasEncrypted = false;
+        hasDecrypted = false;
+        hasProcessed = false;
+        encBtn.style.display = "flex";
+        decBtn.style.display = "flex";
+        encMultipleBtn.style.display = "flex";
+        decMultipleBtn.style.display = "flex";
+        restoreBtn.style.display = "none";
+        updateDownloadButtonVisibility();
+        enableButtons();
+    } catch (error) {
+        showError('重置按钮状态时出错: ' + error.message);
+    }
+}
+
+function showRestoreButton() {
+    try {
+        hasProcessed = true;
+        restoreBtn.style.display = "flex";
+        updateDownloadButtonVisibility();
+    } catch (error) {
+        showError('显示还原按钮时出错: ' + error.message);
+    }
+}
+
+function updateDownloadButtonVisibility() {
+    try {
+        if (hasImage && (hasEncrypted || hasDecrypted) && (encBtn.style.display !== "none" || decBtn.style.display !== "none")) {
+            downloadBtn.style.display = "flex";
+        } else {
+            downloadBtn.style.display = "none";
+        }
+    } catch (error) {
+        showError('更新下载按钮可见性时出错: ' + error.message);
+    }
+}
+
+function rgbToHsl(r, g, b) {
+    r /= 255, g /= 255, b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+
+    if (max === min) {
+        h = s = 0;
+    } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+
+    return [h * 360, s * 100, l * 100];
+}
+
+function hslToRgb(h, s, l) {
+    h /= 360;
+    s /= 100;
+    l /= 100;
+    let r, g, b;
+
+    if (s === 0) {
+        r = g = b = l;
+    } else {
+        const hue2rgb = (p, q, t) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1/6) return p + (q - p) * 6 * t;
+            if (t < 1/2) return q;
+            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        };
+
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+    }
+
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+
+function adjustGreenColor(data, enhance = true) {
+    const result = new Uint8ClampedArray(data.length);
+    
+    for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+        
+        const [h, s, l] = rgbToHsl(r, g, b);
+        
+        let newR = r, newG = g, newB = b;
+        
+        // 更精确的绿色检测，避免误判
+        const isGreenish = (h >= 75 && h <= 165 && s > 8 && l > 10 && l < 90);
+        
+        if (enhance && isGreenish) {
+            // 增强绿色：更自然的增强算法
+            const greenFactor = 1.0 + (Math.min(s, 70) / 100) * 0.6; // 降低增强幅度
+            const redBlueFactor = Math.max(0.7, 1.0 - (Math.min(s, 70) / 100) * 0.3); // 减少红蓝通道削减
+            
+            newG = Math.min(255, Math.round(g * greenFactor));
+            newR = Math.max(0, Math.round(r * redBlueFactor));
+            newB = Math.max(0, Math.round(b * redBlueFactor));
+            
+            // 保持亮度平衡
+            const oldBrightness = 0.299 * r + 0.587 * g + 0.114 * b;
+            const newBrightness = 0.299 * newR + 0.587 * newG + 0.114 * newB;
+            
+            if (newBrightness > oldBrightness * 1.3) { // 限制亮度增加
+                const adjust = (oldBrightness * 1.3) / newBrightness;
+                newR = Math.round(newR * adjust);
+                newG = Math.round(newG * adjust);
+                newB = Math.round(newB * adjust);
+            }
+            
+        } else if (!enhance && isGreenish) {
+            // 减弱绿色：更保守的减弱算法
+            const greenFactor = Math.max(0.5, 1.0 - (Math.min(s, 80) / 100) * 0.5); // 减少减弱幅度
+            const redBlueFactor = Math.min(1.3, 1.0 + (Math.min(s, 80) / 100) * 0.3); // 适度增强红蓝
+            
+            newG = Math.max(0, Math.round(g * greenFactor));
+            newR = Math.min(255, Math.round(r * redBlueFactor));
+            newB = Math.min(255, Math.round(b * redBlueFactor));
+            
+            // 保持整体亮度
+            const oldBrightness = 0.299 * r + 0.587 * g + 0.114 * b;
+            const newBrightness = 0.299 * newR + 0.587 * newG + 0.114 * newB;
+            
+            if (Math.abs(newBrightness - oldBrightness) > oldBrightness * 0.2) {
+                const adjust = oldBrightness / newBrightness;
+                newR = Math.round(newR * adjust);
+                newG = Math.round(newG * adjust);
+                newB = Math.round(newB * adjust);
+            }
+        }
+        
+        // 确保值在有效范围内
+        result[i] = Math.max(0, Math.min(255, newR));
+        result[i + 1] = Math.max(0, Math.min(255, newG));
+        result[i + 2] = Math.max(0, Math.min(255, newB));
+        result[i + 3] = a;
+    }
+    
+    return result;
+}
+
+// 禁用所有操作按钮
+function disableButtons() {
+    const buttons = [encBtn, decBtn, encMultipleBtn, decMultipleBtn, restoreBtn, clearBtn, downloadBtn];
+    buttons.forEach(btn => {
+        if (btn) {
+            btn.classList.add('disabled');
+        }
+    });
+}
+
+// 启用所有操作按钮
+function enableButtons() {
+    const buttons = [encBtn, decBtn, encMultipleBtn, decMultipleBtn, restoreBtn, clearBtn, downloadBtn];
+    buttons.forEach(btn => {
+        if (btn) {
+            btn.classList.remove('disabled');
+        }
+    });
+}
+
+function encryptCommon(imgElement, isCompatibilityMode = false, hideButtons = true) {
+    try {
+        if (isProcessing) {
+            showError('当前有操作正在进行，请稍后重试');
+            return;
+        }
+        
+        isProcessing = true;
+        disableButtons();
+        showLoader();
+        
+        // 使用setImmediate或setTimeout来避免阻塞UI
+        const executeEncrypt = () => {
+            try {
+                releaseLargeObjects();
+                
+                const cvs = document.createElement("canvas");
+                largeObjects.canvas = cvs;
+                const width = cvs.width = imgElement.width;
+                const height = cvs.height = imgElement.height;
+                const ctx = cvs.getContext("2d", { willReadFrequently: true });
+                ctx.drawImage(imgElement, 0, 0);
+                let imgdata = ctx.getImageData(0, 0, width, height);
+                largeObjects.imgData = imgdata;
+                
+                if (enableGreen.checked) {
+                    const enhancedData = adjustGreenColor(imgdata.data, true);
+                    imgdata.data.set(enhancedData);
+                }
+                
+                const imgdata2 = new ImageData(width, height);
+                
+                let curve;
+                if (isCompatibilityMode) {
+                    curve = gilbert2dRecursive(width, height);
+                } else {
+                    curve = gilbert2dIterative(width, height);
+                }
+                
+                largeObjects.curve = curve;
+                const offset = Math.round((Math.sqrt(5) - 1) / 2 * width * height);
+                
+                // 使用更高效的方式处理像素
+                const totalPixels = width * height;
+                for(let i = 0; i < totalPixels; i++){
+                    const old_pos = curve[i];
+                    const new_pos = curve[(i + offset) % totalPixels];
+                    const old_p = 4 * (old_pos[0] + old_pos[1] * width);
+                    const new_p = 4 * (new_pos[0] + new_pos[1] * width);
+                    
+                    // 直接复制4个值（RGBA）
+                    imgdata2.data[new_p] = imgdata.data[old_p];
+                    imgdata2.data[new_p + 1] = imgdata.data[old_p + 1];
+                    imgdata2.data[new_p + 2] = imgdata.data[old_p + 2];
+                    imgdata2.data[new_p + 3] = imgdata.data[old_p + 3];
+                }
+                
+                ctx.putImageData(imgdata2, 0, 0);
+                
+                const processBlob = (blob) => {
+                    try {
+                        const blobURL = URL.createObjectURL(blob);
+                        setImageSrc(blobURL);
+                        hideLoader();
+                        
+                        hasEncrypted = true;
+                        showRestoreButton();
+                        updateDownloadButtonVisibility();
+                        
+                        if (hideButtons) {
+                            encBtn.style.display = "none";
+                            encMultipleBtn.style.display = "none";
+                        }
+                        
+                        releaseLargeObjects();
+                        isProcessing = false;
+                        enableButtons();
+                    } catch (error) {
+                        hideLoader();
+                        showError('处理后处理时出错: ' + error.message);
+                        isProcessing = false;
+                        enableButtons();
+                    }
+                };
+                
+                if (isCompatibilityMode) {
+                    cvs.toBlob(processBlob, "image/jpeg", 1);
+                } else {
+                    const format = formatSelect.value;
+                    if (format === 'png') {
+                        cvs.toBlob(processBlob, "image/png");
+                    } else {
+                        const quality = parseInt(qualityRange.value) / 100;
+                        cvs.toBlob(processBlob, "image/jpeg", quality);
+                    }
+                }
+            } catch (error) {
+                hideLoader();
+                showError('加密处理时出错: ' + error.message);
+                releaseLargeObjects();
+                isProcessing = false;
+                enableButtons();
+            }
+        };
+        
+        // 使用setTimeout避免阻塞UI，特别是对于大图片
+        setTimeout(executeEncrypt, 10);
+    } catch (error) {
+        hideLoader();
+        showError('加密函数调用时出错: ' + error.message);
+        isProcessing = false;
+        enableButtons();
+    }
+}
+
+function decryptCommon(imgElement, isCompatibilityMode = false, hideButtons = true) {
+    try {
+        if (isProcessing) {
+            showError('当前有操作正在进行，请稍后重试');
+            return;
+        }
+        
+        isProcessing = true;
+        disableButtons();
+        showLoader();
+        
+        const executeDecrypt = () => {
+            try {
+                releaseLargeObjects();
+                
+                const cvs = document.createElement("canvas");
+                largeObjects.canvas = cvs;
+                const width = cvs.width = imgElement.width;
+                const height = cvs.height = imgElement.height;
+                const ctx = cvs.getContext("2d", { willReadFrequently: true });
+                ctx.drawImage(imgElement, 0, 0);
+                let imgdata = ctx.getImageData(0, 0, width, height);
+                largeObjects.imgData = imgdata;
+                const imgdata2 = new ImageData(width, height);
+                
+                let curve;
+                if (isCompatibilityMode) {
+                    curve = gilbert2dRecursive(width, height);
+                } else {
+                    curve = gilbert2dIterative(width, height);
+                }
+                
+                largeObjects.curve = curve;
+                const offset = Math.round((Math.sqrt(5) - 1) / 2 * width * height);
+                
+                // 使用更高效的方式处理像素
+                const totalPixels = width * height;
+                for(let i = 0; i < totalPixels; i++){
+                    const old_pos = curve[i];
+                    const new_pos = curve[(i + offset) % totalPixels];
+                    const old_p = 4 * (old_pos[0] + old_pos[1] * width);
+                    const new_p = 4 * (new_pos[0] + new_pos[1] * width);
+                    
+                    // 直接复制4个值（RGBA）
+                    imgdata2.data[old_p] = imgdata.data[new_p];
+                    imgdata2.data[old_p + 1] = imgdata.data[new_p + 1];
+                    imgdata2.data[old_p + 2] = imgdata.data[new_p + 2];
+                    imgdata2.data[old_p + 3] = imgdata.data[new_p + 3];
+                }
+                
+                let finalData = new Uint8ClampedArray(imgdata2.data);
+                
+                if (reduceGreen.checked) {
+                    finalData = adjustGreenColor(finalData, false);
+                }
+                
+                imgdata2.data.set(finalData);
+                ctx.putImageData(imgdata2, 0, 0);
+                
+                const processBlob = (blob) => {
+                    try {
+                        const blobURL = URL.createObjectURL(blob);
+                        setImageSrc(blobURL);
+                        hideLoader();
+                        
+                        hasDecrypted = true;
+                        showRestoreButton();
+                        updateDownloadButtonVisibility();
+                        
+                        if (hideButtons) {
+                            decBtn.style.display = "none";
+                            decMultipleBtn.style.display = "none";
+                        }
+                        
+                        releaseLargeObjects();
+                        isProcessing = false;
+                        enableButtons();
+                    } catch (error) {
+                        hideLoader();
+                        showError('处理后处理时出错: ' + error.message);
+                        isProcessing = false;
+                        enableButtons();
+                    }
+                };
+                
+                if (isCompatibilityMode) {
+                    cvs.toBlob(processBlob, "image/jpeg", 1);
+                } else {
+                    const format = formatSelect.value;
+                    if (format === 'png') {
+                        cvs.toBlob(processBlob, "image/png");
+                    } else {
+                        const quality = parseInt(qualityRange.value) / 100;
+                        cvs.toBlob(processBlob, "image/jpeg", quality);
+                    }
+                }
+            } catch (error) {
+                hideLoader();
+                showError('解密处理时出错: ' + error.message);
+                releaseLargeObjects();
+                isProcessing = false;
+                enableButtons();
+            }
+        };
+        
+        setTimeout(executeDecrypt, 10);
+    } catch (error) {
+        hideLoader();
+        showError('解密函数调用时出错: ' + error.message);
+        isProcessing = false;
+        enableButtons();
+    }
+}
+
+function encrypt(imgElement, hideButtons = true) {
+    const isCompatibilityMode = enableTomatoCompatibility.checked;
+    encryptCommon(imgElement, isCompatibilityMode, hideButtons);
+}
+
+function decrypt(imgElement, hideButtons = true) {
+    const isCompatibilityMode = enableTomatoCompatibility.checked;
+    decryptCommon(imgElement, isCompatibilityMode, hideButtons);
+}
+
+function downloadImage() {
+    try {
+        if (!img.src || img.src === '') return;
+        
+        const link = document.createElement('a');
+        link.download = getDownloadFileName();
+        link.href = img.src;
+        link.click();
+    } catch (error) {
+        showError('下载图片时出错: ' + error.message);
+    }
+}
+
+function getDownloadFileName() {
+    try {
+        const format = enableTomatoCompatibility.checked ? 'jpg' : formatSelect.value;
+        const prefix = hasEncrypted ? 'encrypted_' : hasDecrypted ? 'decrypted_' : 'image_';
+        const timestamp = new Date().getTime();
+        const extension = format === 'png' ? 'png' : 'jpg';
+        
+        if (currentFileName) {
+            const nameWithoutExt = currentFileName.replace(/\.[^/.]+$/, "");
+            return `${prefix}${nameWithoutExt}_${timestamp}.${extension}`;
+        }
+        
+        return `${prefix}${timestamp}.${extension}`;
+    } catch (error) {
+        showError('生成下载文件名时出错: ' + error.message);
+        return 'image_' + new Date().getTime() + '.png';
+    }
+}
+
+function clearImage() {
+    try {
+        if (isProcessing) {
+            showError('当前有操作正在进行，无法清除图片');
+            return;
+        }
+        
+        img.onerror = null;
+        img.onload = null;
+        
+        img.style.display = "none";
+        
+        setTimeout(() => {
+            img.src = "";
+        }, 10);
+        
+        releaseAllBlobURLs();
+        
+        releaseLargeObjects();
+        
+        const ipt = document.getElementById("ipt");
+        if (ipt) {
+            ipt.value = "";
+        }
+        
+        hasImage = false;
+        hasEncrypted = false;
+        hasDecrypted = false;
+        hasProcessed = false;
+        currentFileName = "";
+        
+        resetButtonStates();
+        clearBtn.style.display = "none";
+        downloadBtn.style.display = "none";
+        
+        console.log('图片已清除，资源已释放');
+    } catch (error) {
+        showError('清除图片时出错: ' + error.message);
+    }
+}
+
+function addWaveEffect(event, waveColor) {
+    try {
+        const button = event.currentTarget;
+        const wave = document.createElement('div');
+        wave.className = 'wave';
+        
+        const rect = button.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        wave.style.left = x + 'px';
+        wave.style.top = y + 'px';
+        
+        const enhancedColor = waveColor.replace('0.7', '0.9').replace('0.6', '0.9');
+        wave.style.backgroundColor = enhancedColor;
+        
+        button.appendChild(wave);
+        
+        setTimeout(() => {
+            if (wave && wave.parentNode) {
+                wave.remove();
+            }
+        }, 800);
+    } catch (error) {
+        console.error('添加波浪效果时出错:', error);
+    }
+}
+
+function updateCompatibilitySettings() {
+    const isCompatibilityMode = enableTomatoCompatibility.checked;
+    
+    if (isCompatibilityMode) {
+        formatSelect.value = 'jpg';
+        formatSelect.disabled = true;
+        qualityRange.value = 1;
+        qualityValue.textContent = '1';
+        qualityRange.disabled = true;
+        
+        if (formatSelect.value === 'jpg') {
+            qualityOption.style.display = 'none';
+        }
+    } else {
+        formatSelect.disabled = false;
+        qualityRange.disabled = false;
+        qualityRange.value = 95;
+        qualityValue.textContent = '95';
+        
+        if (formatSelect.value === 'jpg') {
+            qualityOption.style.display = 'block';
+        } else {
+            qualityOption.style.display = 'none';
+        }
+    }
+}
+
+const buttons = [
+    { element: document.querySelector('.file-button'), color: 'rgba(106, 17, 203, 0.9)' },
+    { element: encBtn, color: 'rgba(30, 144, 255, 0.9)' },
+    { element: decBtn, color: 'rgba(220, 20, 60, 0.9)' },
+    { element: encMultipleBtn, color: 'rgba(30, 144, 255, 0.9)' },
+    { element: decMultipleBtn, color: 'rgba(220, 20, 60, 0.9)' },
+    { element: restoreBtn, color: 'rgba(255, 140, 0, 0.9)' },
+    { element: clearBtn, color: 'rgba(50, 205, 50, 0.9)' },
+    { element: downloadBtn, color: 'rgba(0, 191, 255, 0.9)' },
+    { element: clearErrorsBtn, color: 'rgba(255, 140, 0, 0.9)' },
+    { element: copyErrorsBtn, color: 'rgba(30, 144, 255, 0.9)' },
+    { element: openErrorWindowBtn, color: 'rgba(106, 17, 203, 0.9)' }
+];
+
+buttons.forEach(button => {
+    if (button.element) {
+        button.element.addEventListener('click', (e) => {
+            if (!button.element.classList.contains('disabled')) {
+                addWaveEffect(e, button.color);
+            }
+        });
+    }
+});
+
+const ipt = document.getElementById("ipt");
+ipt.onchange = () => {
+    try {
+        if(ipt.files.length > 0){
+            if (isProcessing) {
+                showError('当前有操作正在进行，无法选择新图片');
+                return;
+            }
+            resetButtonStates();
+            img.style.display = "none";
+            const fileURL = URL.createObjectURL(ipt.files[0]);
+            setImageSrc(fileURL);
+            hasImage = true;
+            currentFileName = ipt.files[0].name;
+            clearBtn.style.display = "flex";
+            downloadBtn.style.display = "none";
+        }
+    } catch (error) {
+        showError('选择图片时出错: ' + error.message);
+    }
+}
+
+encBtn.onclick = () => {
+    try {
+        if (isProcessing) return;
+        if(img.src && img.src !== ''){
+            img.style.display = "none";
+            encrypt(img, true);
+        }
+    } catch (error) {
+        showError('点击混淆按钮时出错: ' + error.message);
+    }
+}
+
+decBtn.onclick = () => {
+    try {
+        if (isProcessing) return;
+        if(img.src && img.src !== ''){
+            img.style.display = "none";
+            decrypt(img, true);
+        }
+    } catch (error) {
+        showError('点击解混淆按钮时出错: ' + error.message);
+    }
+}
+
+encMultipleBtn.onclick = () => {
+    try {
+        if (isProcessing) return;
+        if(img.src && img.src !== ''){
+            img.style.display = "none";
+            encrypt(img, false);
+        }
+    } catch (error) {
+        showError('点击多次混淆按钮时出错: ' + error.message);
+    }
+}
+
+decMultipleBtn.onclick = () => {
+    try {
+        if (isProcessing) return;
+        if(img.src && img.src !== ''){
+            img.style.display = "none";
+            decrypt(img, false);
+        }
+    } catch (error) {
+        showError('点击多次解混淆按钮时出错: ' + error.message);
+    }
+}
+
+restoreBtn.onclick = () => {
+    try {
+        if (isProcessing) {
+            showError('当前有操作正在进行，无法还原图片');
+            return;
+        }
+        if(ipt.files.length > 0){
+            resetButtonStates();
+            img.style.display = "none";
+            const fileURL = URL.createObjectURL(ipt.files[0]);
+            setImageSrc(fileURL);
+            hasImage = true;
+            downloadBtn.style.display = "none";
+        }
+    } catch (error) {
+        showError('还原原图时出错: ' + error.message);
+    }
+}
+
+downloadBtn.onclick = () => {
+    downloadImage();
+};
+
+clearBtn.onclick = () => {
+    clearImage();
+};
+
+formatSelect.addEventListener('change', function() {
+    try {
+        if(this.value === 'jpg' && !enableTomatoCompatibility.checked) {
+            qualityOption.style.display = 'block';
+        } else {
+            qualityOption.style.display = 'none';
+        }
+    } catch (error) {
+        showError('更改输出格式时出错: ' + error.message);
+    }
+});
+
+qualityRange.addEventListener('input', debounce(function() {
+    try {
+        qualityValue.textContent = this.value;
+    } catch (error) {
+        showError('更新质量滑块值时出错: ' + error.message);
+    }
+}, 100));
+
+enableTomatoCompatibility.addEventListener('change', function() {
+    try {
+        updateCompatibilitySettings();
+        console.log('兼容小番茄设置已' + (this.checked ? '开启' : '关闭'));
+    } catch (error) {
+        showError('更新兼容设置时出错: ' + error.message);
+    }
+});
+
+qualityValue.textContent = qualityRange.value;
+
+window.addEventListener('beforeunload', function() {
+    try {
+        releaseAllBlobURLs();
+        releaseLargeObjects();
+    } catch (error) {
+        console.error('页面卸载时清理资源出错:', error);
+    }
+});
+
+setInterval(() => {
+    if (document.hidden) {
+        const hiddenTime = Date.now() - (document.hiddenStartTime || Date.now());
+        if (hiddenTime > 5 * 60 * 1000) {
+            releaseLargeObjects();
+        }
+    }
+}, 60000);
+
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        document.hiddenStartTime = Date.now();
+    } else {
+        document.hiddenStartTime = null;
+    }
+});
+
+if (showErrors) {
+    showErrors.checked = false;
+    console.log('开发者设置已初始化：弹出报错信息默认关闭');
+}
+
+if (enableTomatoCompatibility) {
+    enableTomatoCompatibility.checked = false;
+    updateCompatibilitySettings();
+    console.log('兼容设置已初始化：兼容小番茄混淆处理默认关闭');
+}
+</script>
+</body>
+</html>
