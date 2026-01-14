@@ -102,23 +102,27 @@
             border-radius: 12px;
             position: relative;
             display: inline-block;
-            transition: all 0.25s ease;
+            transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.25);
             font-weight: 600;
             font-size: 17px;
             cursor: pointer;
             margin-bottom: 10px;
             overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .file-button:hover {
-            background-color: rgba(106, 17, 203, 0.5);
-            transform: translateY(-3px);
+            background-color: rgba(106, 17, 203, 0.7);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(106, 17, 203, 0.4), 0 0 20px rgba(106, 17, 203, 0.3);
+            border-color: rgba(255, 255, 255, 0.4);
         }
         
         .file-button:active {
-            background-color: rgba(106, 17, 203, 0.35);
-            transform: translateY(0);
+            background-color: rgba(106, 17, 203, 0.5);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(106, 17, 203, 0.3);
         }
         
         .file-button span {
@@ -126,6 +130,7 @@
             display: block;
             color: #ffffff;
             font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
         
         .ipt_btn {
@@ -148,36 +153,57 @@
         .action-button-row {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 10px;
+        }
+        
+        .button-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .action-button {
             height: 60px;
-            padding: 0 30px;
+            padding: 0 20px;
             border: none;
             border-radius: 12px;
             font-size: 17px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 140px;
+            min-width: 120px;
             letter-spacing: 0.5px;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 2px solid rgba(255, 255, 255, 0.2);
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .action-button:hover {
-            transform: translateY(-3px);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
         }
         
         .action-button:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .action-button.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .action-button.disabled:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
         }
         
         #enc {
@@ -185,12 +211,14 @@
             color: #d9e6ff;
         }
         
-        #enc:hover {
-            background-color: rgba(30, 144, 255, 0.5);
+        #enc:hover:not(.disabled) {
+            background-color: rgba(30, 144, 255, 0.7);
+            box-shadow: 0 8px 15px rgba(30, 144, 255, 0.4), 0 0 20px rgba(30, 144, 255, 0.3);
         }
         
-        #enc:active {
-            background-color: rgba(30, 144, 255, 0.35);
+        #enc:active:not(.disabled) {
+            background-color: rgba(30, 144, 255, 0.5);
+            box-shadow: 0 4px 8px rgba(30, 144, 255, 0.3);
         }
         
         #dec {
@@ -198,12 +226,14 @@
             color: #ffd9e6;
         }
         
-        #dec:hover {
-            background-color: rgba(220, 20, 60, 0.5);
+        #dec:hover:not(.disabled) {
+            background-color: rgba(220, 20, 60, 0.7);
+            box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4), 0 0 20px rgba(220, 20, 60, 0.3);
         }
         
-        #dec:active {
-            background-color: rgba(220, 20, 60, 0.35);
+        #dec:active:not(.disabled) {
+            background-color: rgba(220, 20, 60, 0.5);
+            box-shadow: 0 4px 8px rgba(220, 20, 60, 0.3);
         }
         
         #re {
@@ -212,12 +242,14 @@
             display: none;
         }
         
-        #re:hover {
-            background-color: rgba(255, 140, 0, 0.5);
+        #re:hover:not(.disabled) {
+            background-color: rgba(255, 140, 0, 0.7);
+            box-shadow: 0 8px 15px rgba(255, 140, 0, 0.4), 0 0 20px rgba(255, 140, 0, 0.3);
         }
         
-        #re:active {
-            background-color: rgba(255, 140, 0, 0.35);
+        #re:active:not(.disabled) {
+            background-color: rgba(255, 140, 0, 0.5);
+            box-shadow: 0 4px 8px rgba(255, 140, 0, 0.3);
         }
         
         #clear {
@@ -226,12 +258,14 @@
             display: none;
         }
         
-        #clear:hover {
-            background-color: rgba(50, 205, 50, 0.5);
+        #clear:hover:not(.disabled) {
+            background-color: rgba(50, 205, 50, 0.7);
+            box-shadow: 0 8px 15px rgba(50, 205, 50, 0.4), 0 0 20px rgba(50, 205, 50, 0.3);
         }
         
-        #clear:active {
-            background-color: rgba(50, 205, 50, 0.35);
+        #clear:active:not(.disabled) {
+            background-color: rgba(50, 205, 50, 0.5);
+            box-shadow: 0 4px 8px rgba(50, 205, 50, 0.3);
         }
         
         #download {
@@ -240,12 +274,86 @@
             display: none;
         }
         
-        #download:hover {
-            background-color: rgba(0, 191, 255, 0.5);
+        #download:hover:not(.disabled) {
+            background-color: rgba(0, 191, 255, 0.7);
+            box-shadow: 0 8px 15px rgba(0, 191, 255, 0.4), 0 0 20px rgba(0, 191, 255, 0.3);
         }
         
-        #download:active {
-            background-color: rgba(0, 191, 255, 0.35);
+        #download:active:not(.disabled) {
+            background-color: rgba(0, 191, 255, 0.5);
+            box-shadow: 0 4px 8px rgba(0, 191, 255, 0.3);
+        }
+        
+        .circle-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .circle-button:hover:not(.disabled) {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .circle-button:active:not(.disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .circle-button.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .circle-button.disabled:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        #enc-multiple {
+            background-color: rgba(30, 144, 255, 0.4);
+            color: #d9e6ff;
+        }
+        
+        #enc-multiple:hover:not(.disabled) {
+            background-color: rgba(30, 144, 255, 0.7);
+            box-shadow: 0 8px 15px rgba(30, 144, 255, 0.4), 0 0 20px rgba(30, 144, 255, 0.3);
+        }
+        
+        #enc-multiple:active:not(.disabled) {
+            background-color: rgba(30, 144, 255, 0.5);
+            box-shadow: 0 4px 8px rgba(30, 144, 255, 0.3);
+        }
+        
+        #dec-multiple {
+            background-color: rgba(220, 20, 60, 0.4);
+            color: #ffd9e6;
+        }
+        
+        #dec-multiple:hover:not(.disabled) {
+            background-color: rgba(220, 20, 60, 0.7);
+            box-shadow: 0 8px 15px rgba(220, 20, 60, 0.4), 0 0 20px rgba(220, 20, 60, 0.3);
+        }
+        
+        #dec-multiple:active:not(.disabled) {
+            background-color: rgba(220, 20, 60, 0.5);
+            box-shadow: 0 4px 8px rgba(220, 20, 60, 0.3);
         }
         
         .format-options {
@@ -643,6 +751,7 @@
         
         .file-button .wave,
         .action-button .wave,
+        .circle-button .wave,
         .copy-button .wave,
         .clear-errors-button .wave {
             position: absolute;
@@ -727,11 +836,17 @@
             justify-content: center;
             align-items: center;
             border-radius: 50%;
-            transition: background-color 0.2s;
+            transition: all 0.3s ease;
         }
         
         .error-close:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .error-close:active {
             background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(0.95);
         }
         
         .error-content {
@@ -768,13 +883,22 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .copy-button:hover {
             background-color: rgba(30, 144, 255, 0.8);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 12px rgba(30, 144, 255, 0.3);
+        }
+        
+        .copy-button:active {
+            background-color: rgba(30, 144, 255, 0.7);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(30, 144, 255, 0.2);
         }
         
         .clear-errors-button {
@@ -786,13 +910,22 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .clear-errors-button:hover {
             background-color: rgba(255, 140, 0, 0.8);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 12px rgba(255, 140, 0, 0.3);
+        }
+        
+        .clear-errors-button:active {
+            background-color: rgba(255, 140, 0, 0.7);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(255, 140, 0, 0.2);
         }
         
         .error-buttons-container {
@@ -835,13 +968,23 @@
             
             .action-button {
                 height: 55px;
-                min-width: 120px;
-                padding: 0 20px;
+                min-width: 100px;
+                padding: 0 15px;
                 font-size: 16px;
             }
             
+            .circle-button {
+                width: 55px;
+                height: 55px;
+                font-size: 20px;
+            }
+            
             .action-button-row {
-                gap: 10px;
+                gap: 8px;
+            }
+            
+            .button-group {
+                gap: 6px;
             }
             
             .loader {
@@ -906,9 +1049,20 @@
                 gap: 12px;
             }
             
-            .action-button {
+            .button-group {
                 width: 100%;
                 max-width: 250px;
+                justify-content: center;
+            }
+            
+            .action-button {
+                width: 100%;
+                max-width: 180px;
+            }
+            
+            .circle-button {
+                width: 50px;
+                height: 50px;
             }
             
             .image-container {
@@ -996,11 +1150,17 @@
         
         <div class="action-buttons">
             <div class="action-button-row">
-                <button id="enc" class="action-button">混淆图片</button>
-                <button id="dec" class="action-button">解混淆</button>
+                <div class="button-group">
+                    <button id="enc" class="action-button">混淆图片</button>
+                    <button id="enc-multiple" class="circle-button">+</button>
+                </div>
+                <div class="button-group">
+                    <button id="dec" class="action-button">解混淆</button>
+                    <button id="dec-multiple" class="circle-button">-</button>
+                </div>
             </div>
             <div class="action-button-row">
-                <button id="re" class="action-button">还原原图</button>
+                <button id="re" class="action-button" style="min-width: 200px;">还原原图</button>
             </div>
         </div>
         
@@ -1215,6 +1375,8 @@ const img = document.getElementById("display-img");
 const loader = document.getElementById("loader");
 const encBtn = document.getElementById("enc");
 const decBtn = document.getElementById("dec");
+const encMultipleBtn = document.getElementById("enc-multiple");
+const decMultipleBtn = document.getElementById("dec-multiple");
 const restoreBtn = document.getElementById("re");
 const clearBtn = document.getElementById("clear");
 const downloadBtn = document.getElementById("download");
@@ -1251,6 +1413,9 @@ let largeObjects = {
     imgData: null,
     curve: null
 };
+
+// 并发控制：防止快速连续点击导致多个操作同时进行
+let isProcessing = false;
 
 function debounce(func, wait) {
     return function() {
@@ -1399,26 +1564,72 @@ function releaseAllBlobURLs() {
 
 function releaseLargeObjects() {
     try {
+        // 释放canvas资源
         if (largeObjects.canvas) {
             const ctx = largeObjects.canvas.getContext('2d');
             if (ctx) {
+                // 清除canvas内容
                 ctx.clearRect(0, 0, largeObjects.canvas.width, largeObjects.canvas.height);
+                // 释放ImageData资源
+                if (largeObjects.imgData) {
+                    // 创建空的ImageData来替换原来的数据
+                    ctx.putImageData(new ImageData(largeObjects.canvas.width, largeObjects.canvas.height), 0, 0);
+                }
             }
+            
+            // 移除canvas元素
             if (largeObjects.canvas.parentNode) {
                 largeObjects.canvas.parentNode.removeChild(largeObjects.canvas);
             }
+            
+            // 显式设置canvas尺寸为0
+            largeObjects.canvas.width = 0;
+            largeObjects.canvas.height = 0;
+            
+            // 移除所有事件监听器
+            const newCanvas = largeObjects.canvas.cloneNode(false);
             largeObjects.canvas = null;
+            
+            // 如果浏览器支持，手动触发垃圾回收提示
+            if (typeof window.gc === 'function') {
+                try {
+                    window.gc();
+                } catch (e) {
+                    // 忽略gc错误
+                }
+            }
         }
         
+        // 释放ImageData资源
         largeObjects.imgData = null;
         
+        // 释放曲线数据
         largeObjects.curve = null;
         
-        if (window.gc) {
-            window.gc();
+        // 强制垃圾回收提示（非标准方法，仅用于调试）
+        try {
+            if (window.CollectGarbage) {
+                window.CollectGarbage();
+            }
+        } catch (e) {
+            // 忽略错误
         }
+        
+        // 使用requestAnimationFrame给浏览器时间进行垃圾回收
+        requestAnimationFrame(() => {
+            // 可以尝试分配和释放一些内存来提示垃圾回收器
+            const temp = new Array(1000).fill(0);
+            setTimeout(() => {
+                // 空操作，只是给垃圾回收器时间
+            }, 0);
+        });
+        
     } catch (error) {
         console.error('释放大对象时出错:', error);
+        // 即使出错也继续重置变量
+        largeObjects.canvas = null;
+        largeObjects.imgData = null;
+        largeObjects.curve = null;
     }
 }
 
@@ -1480,8 +1691,11 @@ function resetButtonStates() {
         hasProcessed = false;
         encBtn.style.display = "flex";
         decBtn.style.display = "flex";
+        encMultipleBtn.style.display = "flex";
+        decMultipleBtn.style.display = "flex";
         restoreBtn.style.display = "none";
         updateDownloadButtonVisibility();
+        enableButtons();
     } catch (error) {
         showError('重置按钮状态时出错: ' + error.message);
     }
@@ -1571,60 +1785,93 @@ function adjustGreenColor(data, enhance = true) {
         
         let newR = r, newG = g, newB = b;
         
-        const isGreenish = h >= 90 && h <= 180 && s > 10;
+        // 更精确的绿色检测，避免误判
+        const isGreenish = (h >= 75 && h <= 165 && s > 8 && l > 10 && l < 90);
         
-        if (enhance) {
-            if (isGreenish) {
-                const enhanceFactor = 1.0 + (s / 100) * 0.8;
-                
-                newG = Math.min(255, g * enhanceFactor);
-                
-                const reduceFactor = Math.max(0.6, 1.0 - (g / 255) * 0.4);
-                newR = Math.max(0, r * reduceFactor);
-                newB = Math.max(0, b * reduceFactor);
-                
-                const [newH, newS, newL] = rgbToHsl(newR, newG, newB);
-                const enhancedS = Math.min(100, newS * 1.2);
-                const [finalR, finalG, finalB] = hslToRgb(newH, enhancedS, newL);
-                
-                newR = finalR;
-                newG = finalG;
-                newB = finalB;
+        if (enhance && isGreenish) {
+            // 增强绿色：更自然的增强算法
+            const greenFactor = 1.0 + (Math.min(s, 70) / 100) * 0.6; // 降低增强幅度
+            const redBlueFactor = Math.max(0.7, 1.0 - (Math.min(s, 70) / 100) * 0.3); // 减少红蓝通道削减
+            
+            newG = Math.min(255, Math.round(g * greenFactor));
+            newR = Math.max(0, Math.round(r * redBlueFactor));
+            newB = Math.max(0, Math.round(b * redBlueFactor));
+            
+            // 保持亮度平衡
+            const oldBrightness = 0.299 * r + 0.587 * g + 0.114 * b;
+            const newBrightness = 0.299 * newR + 0.587 * newG + 0.114 * newB;
+            
+            if (newBrightness > oldBrightness * 1.3) { // 限制亮度增加
+                const adjust = (oldBrightness * 1.3) / newBrightness;
+                newR = Math.round(newR * adjust);
+                newG = Math.round(newG * adjust);
+                newB = Math.round(newB * adjust);
             }
-        } else {
-            if (isGreenish) {
-                const reduceFactor = Math.max(0.3, 1.0 - (g / 255) * 0.7);
-                
-                newG = Math.max(0, g * reduceFactor);
-                
-                const enhanceFactor = Math.min(1.4, 1.0 + (g / 255) * 0.4);
-                newR = Math.min(255, r * enhanceFactor);
-                newB = Math.min(255, b * enhanceFactor);
-                
-                const [newH, newS, newL] = rgbToHsl(newR, newG, newB);
-                const balancedS = Math.max(0, newS * 0.8);
-                const [finalR, finalG, finalB] = hslToRgb(newH, balancedS, newL);
-                
-                newR = finalR;
-                newG = finalG;
-                newB = finalB;
+            
+        } else if (!enhance && isGreenish) {
+            // 减弱绿色：更保守的减弱算法
+            const greenFactor = Math.max(0.5, 1.0 - (Math.min(s, 80) / 100) * 0.5); // 减少减弱幅度
+            const redBlueFactor = Math.min(1.3, 1.0 + (Math.min(s, 80) / 100) * 0.3); // 适度增强红蓝
+            
+            newG = Math.max(0, Math.round(g * greenFactor));
+            newR = Math.min(255, Math.round(r * redBlueFactor));
+            newB = Math.min(255, Math.round(b * redBlueFactor));
+            
+            // 保持整体亮度
+            const oldBrightness = 0.299 * r + 0.587 * g + 0.114 * b;
+            const newBrightness = 0.299 * newR + 0.587 * newG + 0.114 * newB;
+            
+            if (Math.abs(newBrightness - oldBrightness) > oldBrightness * 0.2) {
+                const adjust = oldBrightness / newBrightness;
+                newR = Math.round(newR * adjust);
+                newG = Math.round(newG * adjust);
+                newB = Math.round(newB * adjust);
             }
         }
         
-        result[i] = Math.round(newR);
-        result[i + 1] = Math.round(newG);
-        result[i + 2] = Math.round(newB);
+        // 确保值在有效范围内
+        result[i] = Math.max(0, Math.min(255, newR));
+        result[i + 1] = Math.max(0, Math.min(255, newG));
+        result[i + 2] = Math.max(0, Math.min(255, newB));
         result[i + 3] = a;
     }
     
     return result;
 }
 
-function encryptCommon(imgElement, isCompatibilityMode = false) {
+// 禁用所有操作按钮
+function disableButtons() {
+    const buttons = [encBtn, decBtn, encMultipleBtn, decMultipleBtn, restoreBtn, clearBtn, downloadBtn];
+    buttons.forEach(btn => {
+        if (btn) {
+            btn.classList.add('disabled');
+        }
+    });
+}
+
+// 启用所有操作按钮
+function enableButtons() {
+    const buttons = [encBtn, decBtn, encMultipleBtn, decMultipleBtn, restoreBtn, clearBtn, downloadBtn];
+    buttons.forEach(btn => {
+        if (btn) {
+            btn.classList.remove('disabled');
+        }
+    });
+}
+
+function encryptCommon(imgElement, isCompatibilityMode = false, hideButtons = true) {
     try {
+        if (isProcessing) {
+            showError('当前有操作正在进行，请稍后重试');
+            return;
+        }
+        
+        isProcessing = true;
+        disableButtons();
         showLoader();
         
-        setTimeout(() => {
+        // 使用setImmediate或setTimeout来避免阻塞UI
+        const executeEncrypt = () => {
             try {
                 releaseLargeObjects();
                 
@@ -1632,7 +1879,7 @@ function encryptCommon(imgElement, isCompatibilityMode = false) {
                 largeObjects.canvas = cvs;
                 const width = cvs.width = imgElement.width;
                 const height = cvs.height = imgElement.height;
-                const ctx = cvs.getContext("2d");
+                const ctx = cvs.getContext("2d", { willReadFrequently: true });
                 ctx.drawImage(imgElement, 0, 0);
                 let imgdata = ctx.getImageData(0, 0, width, height);
                 largeObjects.imgData = imgdata;
@@ -1654,88 +1901,91 @@ function encryptCommon(imgElement, isCompatibilityMode = false) {
                 largeObjects.curve = curve;
                 const offset = Math.round((Math.sqrt(5) - 1) / 2 * width * height);
                 
-                for(let i = 0; i < width * height; i++){
+                // 使用更高效的方式处理像素
+                const totalPixels = width * height;
+                for(let i = 0; i < totalPixels; i++){
                     const old_pos = curve[i];
-                    const new_pos = curve[(i + offset) % (width * height)];
+                    const new_pos = curve[(i + offset) % totalPixels];
                     const old_p = 4 * (old_pos[0] + old_pos[1] * width);
                     const new_p = 4 * (new_pos[0] + new_pos[1] * width);
-                    imgdata2.data.set(imgdata.data.slice(old_p, old_p + 4), new_p);
+                    
+                    // 直接复制4个值（RGBA）
+                    imgdata2.data[new_p] = imgdata.data[old_p];
+                    imgdata2.data[new_p + 1] = imgdata.data[old_p + 1];
+                    imgdata2.data[new_p + 2] = imgdata.data[old_p + 2];
+                    imgdata2.data[new_p + 3] = imgdata.data[old_p + 3];
                 }
+                
                 ctx.putImageData(imgdata2, 0, 0);
                 
-                if (isCompatibilityMode) {
-                    cvs.toBlob(b => {
-                        try {
-                            const blobURL = URL.createObjectURL(b);
-                            setImageSrc(blobURL);
-                            hideLoader();
+                const processBlob = (blob) => {
+                    try {
+                        const blobURL = URL.createObjectURL(blob);
+                        setImageSrc(blobURL);
+                        hideLoader();
+                        
+                        hasEncrypted = true;
+                        showRestoreButton();
+                        updateDownloadButtonVisibility();
+                        
+                        if (hideButtons) {
                             encBtn.style.display = "none";
-                            hasEncrypted = true;
-                            showRestoreButton();
-                            updateDownloadButtonVisibility();
-                            
-                            releaseLargeObjects();
-                        } catch (error) {
-                            hideLoader();
-                            showError('兼容模式加密后处理时出错: ' + error.message);
+                            encMultipleBtn.style.display = "none";
                         }
-                    }, "image/jpeg", 1);
+                        
+                        releaseLargeObjects();
+                        isProcessing = false;
+                        enableButtons();
+                    } catch (error) {
+                        hideLoader();
+                        showError('处理后处理时出错: ' + error.message);
+                        isProcessing = false;
+                        enableButtons();
+                    }
+                };
+                
+                if (isCompatibilityMode) {
+                    cvs.toBlob(processBlob, "image/jpeg", 1);
                 } else {
                     const format = formatSelect.value;
                     if (format === 'png') {
-                        cvs.toBlob(b => {
-                            try {
-                                const blobURL = URL.createObjectURL(b);
-                                setImageSrc(blobURL);
-                                hideLoader();
-                                encBtn.style.display = "none";
-                                hasEncrypted = true;
-                                showRestoreButton();
-                                updateDownloadButtonVisibility();
-                                
-                                releaseLargeObjects();
-                            } catch (error) {
-                                hideLoader();
-                                showError('加密后处理PNG时出错: ' + error.message);
-                            }
-                        }, "image/png");
+                        cvs.toBlob(processBlob, "image/png");
                     } else {
                         const quality = parseInt(qualityRange.value) / 100;
-                        cvs.toBlob(b => {
-                            try {
-                                const blobURL = URL.createObjectURL(b);
-                                setImageSrc(blobURL);
-                                hideLoader();
-                                encBtn.style.display = "none";
-                                hasEncrypted = true;
-                                showRestoreButton();
-                                updateDownloadButtonVisibility();
-                                
-                                releaseLargeObjects();
-                            } catch (error) {
-                                hideLoader();
-                                showError('加密后处理JPG时出错: ' + error.message);
-                            }
-                        }, "image/jpeg", quality);
+                        cvs.toBlob(processBlob, "image/jpeg", quality);
                     }
                 }
             } catch (error) {
                 hideLoader();
                 showError('加密处理时出错: ' + error.message);
                 releaseLargeObjects();
+                isProcessing = false;
+                enableButtons();
             }
-        }, 50);
+        };
+        
+        // 使用setTimeout避免阻塞UI，特别是对于大图片
+        setTimeout(executeEncrypt, 10);
     } catch (error) {
         hideLoader();
         showError('加密函数调用时出错: ' + error.message);
+        isProcessing = false;
+        enableButtons();
     }
 }
 
-function decryptCommon(imgElement, isCompatibilityMode = false) {
+function decryptCommon(imgElement, isCompatibilityMode = false, hideButtons = true) {
     try {
+        if (isProcessing) {
+            showError('当前有操作正在进行，请稍后重试');
+            return;
+        }
+        
+        isProcessing = true;
+        disableButtons();
         showLoader();
         
-        setTimeout(() => {
+        const executeDecrypt = () => {
             try {
                 releaseLargeObjects();
                 
@@ -1743,7 +1993,7 @@ function decryptCommon(imgElement, isCompatibilityMode = false) {
                 largeObjects.canvas = cvs;
                 const width = cvs.width = imgElement.width;
                 const height = cvs.height = imgElement.height;
-                const ctx = cvs.getContext("2d");
+                const ctx = cvs.getContext("2d", { willReadFrequently: true });
                 ctx.drawImage(imgElement, 0, 0);
                 let imgdata = ctx.getImageData(0, 0, width, height);
                 largeObjects.imgData = imgdata;
@@ -1759,12 +2009,19 @@ function decryptCommon(imgElement, isCompatibilityMode = false) {
                 largeObjects.curve = curve;
                 const offset = Math.round((Math.sqrt(5) - 1) / 2 * width * height);
                 
-                for(let i = 0; i < width * height; i++){
+                // 使用更高效的方式处理像素
+                const totalPixels = width * height;
+                for(let i = 0; i < totalPixels; i++){
                     const old_pos = curve[i];
-                    const new_pos = curve[(i + offset) % (width * height)];
+                    const new_pos = curve[(i + offset) % totalPixels];
                     const old_p = 4 * (old_pos[0] + old_pos[1] * width);
                     const new_p = 4 * (new_pos[0] + new_pos[1] * width);
-                    imgdata2.data.set(imgdata.data.slice(new_p, new_p + 4), old_p);
+                    
+                    // 直接复制4个值（RGBA）
+                    imgdata2.data[old_p] = imgdata.data[new_p];
+                    imgdata2.data[old_p + 1] = imgdata.data[new_p + 1];
+                    imgdata2.data[old_p + 2] = imgdata.data[new_p + 2];
+                    imgdata2.data[old_p + 3] = imgdata.data[new_p + 3];
                 }
                 
                 let finalData = new Uint8ClampedArray(imgdata2.data);
@@ -1776,82 +2033,69 @@ function decryptCommon(imgElement, isCompatibilityMode = false) {
                 imgdata2.data.set(finalData);
                 ctx.putImageData(imgdata2, 0, 0);
                 
-                if (isCompatibilityMode) {
-                    cvs.toBlob(b => {
-                        try {
-                            const blobURL = URL.createObjectURL(b);
-                            setImageSrc(blobURL);
-                            hideLoader();
+                const processBlob = (blob) => {
+                    try {
+                        const blobURL = URL.createObjectURL(blob);
+                        setImageSrc(blobURL);
+                        hideLoader();
+                        
+                        hasDecrypted = true;
+                        showRestoreButton();
+                        updateDownloadButtonVisibility();
+                        
+                        if (hideButtons) {
                             decBtn.style.display = "none";
-                            hasDecrypted = true;
-                            showRestoreButton();
-                            updateDownloadButtonVisibility();
-                            
-                            releaseLargeObjects();
-                        } catch (error) {
-                            hideLoader();
-                            showError('兼容模式解密后处理时出错: ' + error.message);
+                            decMultipleBtn.style.display = "none";
                         }
-                    }, "image/jpeg", 1);
+                        
+                        releaseLargeObjects();
+                        isProcessing = false;
+                        enableButtons();
+                    } catch (error) {
+                        hideLoader();
+                        showError('处理后处理时出错: ' + error.message);
+                        isProcessing = false;
+                        enableButtons();
+                    }
+                };
+                
+                if (isCompatibilityMode) {
+                    cvs.toBlob(processBlob, "image/jpeg", 1);
                 } else {
                     const format = formatSelect.value;
                     if (format === 'png') {
-                        cvs.toBlob(b => {
-                            try {
-                                const blobURL = URL.createObjectURL(b);
-                                setImageSrc(blobURL);
-                                hideLoader();
-                                decBtn.style.display = "none";
-                                hasDecrypted = true;
-                                showRestoreButton();
-                                updateDownloadButtonVisibility();
-                                
-                                releaseLargeObjects();
-                            } catch (error) {
-                                hideLoader();
-                                showError('解密后处理PNG时出错: ' + error.message);
-                            }
-                        }, "image/png");
+                        cvs.toBlob(processBlob, "image/png");
                     } else {
                         const quality = parseInt(qualityRange.value) / 100;
-                        cvs.toBlob(b => {
-                            try {
-                                const blobURL = URL.createObjectURL(b);
-                                setImageSrc(blobURL);
-                                hideLoader();
-                                decBtn.style.display = "none";
-                                hasDecrypted = true;
-                                showRestoreButton();
-                                updateDownloadButtonVisibility();
-                                
-                                releaseLargeObjects();
-                            } catch (error) {
-                                hideLoader();
-                                showError('解密后处理JPG时出错: ' + error.message);
-                            }
-                        }, "image/jpeg", quality);
+                        cvs.toBlob(processBlob, "image/jpeg", quality);
                     }
                 }
             } catch (error) {
                 hideLoader();
                 showError('解密处理时出错: ' + error.message);
                 releaseLargeObjects();
+                isProcessing = false;
+                enableButtons();
             }
-        }, 50);
+        };
+        
+        setTimeout(executeDecrypt, 10);
     } catch (error) {
         hideLoader();
         showError('解密函数调用时出错: ' + error.message);
+        isProcessing = false;
+        enableButtons();
     }
 }
 
-function encrypt(imgElement) {
+function encrypt(imgElement, hideButtons = true) {
     const isCompatibilityMode = enableTomatoCompatibility.checked;
-    encryptCommon(imgElement, isCompatibilityMode);
+    encryptCommon(imgElement, isCompatibilityMode, hideButtons);
 }
 
-function decrypt(imgElement) {
+function decrypt(imgElement, hideButtons = true) {
     const isCompatibilityMode = enableTomatoCompatibility.checked;
-    decryptCommon(imgElement, isCompatibilityMode);
+    decryptCommon(imgElement, isCompatibilityMode, hideButtons);
 }
 
 function downloadImage() {
@@ -1888,6 +2132,11 @@ function getDownloadFileName() {
 
 function clearImage() {
     try {
+        if (isProcessing) {
+            showError('当前有操作正在进行，无法清除图片');
+            return;
+        }
+        
         img.onerror = null;
         img.onload = null;
         
@@ -1981,6 +2230,8 @@ const buttons = [
     { element: document.querySelector('.file-button'), color: 'rgba(106, 17, 203, 0.9)' },
     { element: encBtn, color: 'rgba(30, 144, 255, 0.9)' },
     { element: decBtn, color: 'rgba(220, 20, 60, 0.9)' },
+    { element: encMultipleBtn, color: 'rgba(30, 144, 255, 0.9)' },
+    { element: decMultipleBtn, color: 'rgba(220, 20, 60, 0.9)' },
     { element: restoreBtn, color: 'rgba(255, 140, 0, 0.9)' },
     { element: clearBtn, color: 'rgba(50, 205, 50, 0.9)' },
     { element: downloadBtn, color: 'rgba(0, 191, 255, 0.9)' },
@@ -1992,7 +2243,9 @@ const buttons = [
 buttons.forEach(button => {
     if (button.element) {
         button.element.addEventListener('click', (e) => {
-            addWaveEffect(e, button.color);
+            if (!button.element.classList.contains('disabled')) {
+                addWaveEffect(e, button.color);
+            }
         });
     }
 });
@@ -2001,6 +2254,10 @@ const ipt = document.getElementById("ipt");
 ipt.onchange = () => {
     try {
         if(ipt.files.length > 0){
+            if (isProcessing) {
+                showError('当前有操作正在进行，无法选择新图片');
+                return;
+            }
             resetButtonStates();
             img.style.display = "none";
             const fileURL = URL.createObjectURL(ipt.files[0]);
@@ -2017,9 +2274,10 @@ ipt.onchange = () => {
 
 encBtn.onclick = () => {
     try {
-        if(img.src && img.src !== '' && !hasEncrypted){
+        if (isProcessing) return;
+        if(img.src && img.src !== ''){
             img.style.display = "none";
-            encrypt(img);
+            encrypt(img, true);
         }
     } catch (error) {
         showError('点击混淆按钮时出错: ' + error.message);
@@ -2028,17 +2286,46 @@ encBtn.onclick = () => {
 
 decBtn.onclick = () => {
     try {
-        if(img.src && img.src !== '' && !hasDecrypted){
+        if (isProcessing) return;
+        if(img.src && img.src !== ''){
             img.style.display = "none";
-            decrypt(img);
+            decrypt(img, true);
         }
     } catch (error) {
         showError('点击解混淆按钮时出错: ' + error.message);
     }
 }
 
+encMultipleBtn.onclick = () => {
+    try {
+        if (isProcessing) return;
+        if(img.src && img.src !== ''){
+            img.style.display = "none";
+            encrypt(img, false);
+        }
+    } catch (error) {
+        showError('点击多次混淆按钮时出错: ' + error.message);
+    }
+}
+
+decMultipleBtn.onclick = () => {
+    try {
+        if (isProcessing) return;
+        if(img.src && img.src !== ''){
+            img.style.display = "none";
+            decrypt(img, false);
+        }
+    } catch (error) {
+        showError('点击多次解混淆按钮时出错: ' + error.message);
+    }
+}
+
 restoreBtn.onclick = () => {
     try {
+        if (isProcessing) {
+            showError('当前有操作正在进行，无法还原图片');
+            return;
+        }
         if(ipt.files.length > 0){
             resetButtonStates();
             img.style.display = "none";
