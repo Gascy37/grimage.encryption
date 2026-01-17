@@ -284,6 +284,22 @@
             box-shadow: 0 4px 8px rgba(0, 191, 255, 0.3);
         }
         
+        #view {
+            background-color: rgba(138, 43, 226, 0.4); /* 紫色，与其他按钮区分 */
+            color: #f0e6ff;
+            display: none;
+        }
+        
+        #view:hover:not(.disabled) {
+            background-color: rgba(138, 43, 226, 0.7);
+            box-shadow: 0 8px 15px rgba(138, 43, 226, 0.4), 0 0 20px rgba(138, 43, 226, 0.3);
+        }
+        
+        #view:active:not(.disabled) {
+            background-color: rgba(138, 43, 226, 0.5);
+            box-shadow: 0 4px 8px rgba(138, 43, 226, 0.3);
+        }
+        
         .circle-button {
             width: 60px;
             height: 60px;
@@ -654,7 +670,7 @@
             height: 300px;
             left: 50px;
             top: 50px;
-            border-left-color: #8A2BE2; /* 紫色 */
+            border-left-color: #8A2BE2;
             border-right-color: #8A2BE2;
             animation-delay: 0s;
         }
@@ -664,7 +680,7 @@
             height: 260px;
             left: 70px;
             top: 70px;
-            border-left-color: #00CED1; /* 青色 */
+            border-left-color: #00CED1;
             border-right-color: #00CED1;
             animation-delay: 0.1s;
         }
@@ -674,7 +690,7 @@
             height: 220px;
             left: 90px;
             top: 90px;
-            border-left-color: #FF1493; /* 深粉色 */
+            border-left-color: #FF1493;
             border-right-color: #FF1493;
             animation-delay: 0.2s;
         }
@@ -684,7 +700,7 @@
             height: 180px;
             left: 110px;
             top: 110px;
-            border-left-color: #FF8C00; /* 深橙色 */
+            border-left-color: #FF8C00;
             border-right-color: #FF8C00;
             animation-delay: 0.3s;
         }
@@ -1166,6 +1182,7 @@
         
         <div style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-bottom: 15px; gap: 10px;">
             <button id="download" class="action-button" style="min-width: 200px;">下载图片</button>
+            <button id="view" class="action-button" style="min-width: 200px;">查看图片</button>
             <button id="clear" class="action-button" style="min-width: 200px;">清除图片</button>
         </div>
         
@@ -1209,16 +1226,6 @@
                 </details>
                 
                 <details class="sub-settings">
-                    <summary class="sub-summary">兼容设置</summary>
-                    <div class="sub-content">
-                        <div class="setting-item">
-                            <input type="checkbox" id="enable-tomato-compatibility" class="setting-checkbox">
-                            <label for="enable-tomato-compatibility">兼容小番茄混淆处理</label>
-                        </div>
-                    </div>
-                </details>
-                
-                <details class="sub-settings">
                     <summary class="sub-summary">开发者设置</summary>
                     <div class="sub-content">
                         <div class="setting-item">
@@ -1235,71 +1242,6 @@
     </div>
     
 <script>
-function gilbert2dRecursive(width, height) {
-    const coordinates = [];
-
-    if (width >= height) {
-        generate2d(0, 0, width, 0, 0, height, coordinates);
-    } else {
-        generate2d(0, 0, 0, height, width, 0, coordinates);
-    }
-
-    return coordinates;
-}
-
-function generate2d(x, y, ax, ay, bx, by, coordinates) {
-    const w = Math.abs(ax + ay);
-    const h = Math.abs(bx + by);
-
-    const dax = Math.sign(ax), day = Math.sign(ay);
-    const dbx = Math.sign(bx), dby = Math.sign(by);
-
-    if (h === 1) {
-        for (let i = 0; i < w; i++) {
-            coordinates.push([x, y]);
-            x += dax;
-            y += day;
-        }
-        return;
-    }
-
-    if (w === 1) {
-        for (let i = 0; i < h; i++) {
-            coordinates.push([x, y]);
-            x += dbx;
-            y += dby;
-        }
-        return;
-    }
-
-    let ax2 = Math.floor(ax / 2), ay2 = Math.floor(ay / 2);
-    let bx2 = Math.floor(bx / 2), by2 = Math.floor(by / 2);
-
-    const w2 = Math.abs(ax2 + ay2);
-    const h2 = Math.abs(bx2 + by2);
-
-    if (2 * w > 3 * h) {
-        if ((w2 % 2) && (w > 2)) {
-            ax2 += dax;
-            ay2 += day;
-        }
-
-        generate2d(x, y, ax2, ay2, bx, by, coordinates);
-        generate2d(x + ax2, y + ay2, ax - ax2, ay - ay2, bx, by, coordinates);
-
-    } else {
-        if ((h2 % 2) && (h > 2)) {
-            bx2 += dbx;
-            by2 += dby;
-        }
-
-        generate2d(x, y, bx2, by2, ax2, ay2, coordinates);
-        generate2d(x + bx2, y + by2, ax, ay, bx - bx2, by - by2, coordinates);
-        generate2d(x + (ax - dax) + (bx2 - dbx), y + (ay - day) + (by2 - dby),
-            -bx2, -by2, -(ax - ax2), -(ay - ay2), coordinates);
-    }
-}
-
 function gilbert2dIterative(width, height) {
     const coordinates = [];
     
@@ -1369,8 +1311,7 @@ function gilbert2dIterative(width, height) {
     
     return coordinates;
 }
-</script>
-<script>
+
 const img = document.getElementById("display-img");
 const loader = document.getElementById("loader");
 const encBtn = document.getElementById("enc");
@@ -1380,6 +1321,7 @@ const decMultipleBtn = document.getElementById("dec-multiple");
 const restoreBtn = document.getElementById("re");
 const clearBtn = document.getElementById("clear");
 const downloadBtn = document.getElementById("download");
+const viewBtn = document.getElementById("view"); // 新增的查看图片按钮
 const formatSelect = document.getElementById("format-select");
 const qualityOption = document.getElementById("quality-option");
 const qualityRange = document.getElementById("quality-range");
@@ -1389,7 +1331,6 @@ const enableGreen = document.getElementById("enable-green");
 const reduceGreen = document.getElementById("reduce-green");
 const showErrors = document.getElementById("show-errors");
 const openErrorWindowBtn = document.getElementById("open-error-window");
-const enableTomatoCompatibility = document.getElementById("enable-tomato-compatibility");
 
 const errorOverlay = document.getElementById("error-overlay");
 const errorContent = document.getElementById("error-content");
@@ -1402,7 +1343,6 @@ let errorDebounceTimer = null;
 
 let hasEncrypted = false;
 let hasDecrypted = false;
-let hasProcessed = false;
 let hasImage = false;
 let currentFileName = "";
 
@@ -1688,13 +1628,13 @@ function resetButtonStates() {
     try {
         hasEncrypted = false;
         hasDecrypted = false;
-        hasProcessed = false;
         encBtn.style.display = "flex";
         decBtn.style.display = "flex";
         encMultipleBtn.style.display = "flex";
         decMultipleBtn.style.display = "flex";
         restoreBtn.style.display = "none";
         updateDownloadButtonVisibility();
+        updateViewButtonVisibility();
         enableButtons();
     } catch (error) {
         showError('重置按钮状态时出错: ' + error.message);
@@ -1703,9 +1643,9 @@ function resetButtonStates() {
 
 function showRestoreButton() {
     try {
-        hasProcessed = true;
         restoreBtn.style.display = "flex";
         updateDownloadButtonVisibility();
+        updateViewButtonVisibility();
     } catch (error) {
         showError('显示还原按钮时出错: ' + error.message);
     }
@@ -1720,6 +1660,19 @@ function updateDownloadButtonVisibility() {
         }
     } catch (error) {
         showError('更新下载按钮可见性时出错: ' + error.message);
+    }
+}
+
+// 新增：更新查看图片按钮可见性
+function updateViewButtonVisibility() {
+    try {
+        if (hasImage && (hasEncrypted || hasDecrypted) && (encBtn.style.display !== "none" || decBtn.style.display !== "none")) {
+            viewBtn.style.display = "flex";
+        } else {
+            viewBtn.style.display = "none";
+        }
+    } catch (error) {
+        showError('更新查看图片按钮可见性时出错: ' + error.message);
     }
 }
 
@@ -1742,34 +1695,6 @@ function rgbToHsl(r, g, b) {
     }
 
     return [h * 360, s * 100, l * 100];
-}
-
-function hslToRgb(h, s, l) {
-    h /= 360;
-    s /= 100;
-    l /= 100;
-    let r, g, b;
-
-    if (s === 0) {
-        r = g = b = l;
-    } else {
-        const hue2rgb = (p, q, t) => {
-            if (t < 0) t += 1;
-            if (t > 1) t -= 1;
-            if (t < 1/6) return p + (q - p) * 6 * t;
-            if (t < 1/2) return q;
-            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-            return p;
-        };
-
-        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-        const p = 2 * l - q;
-        r = hue2rgb(p, q, h + 1/3);
-        g = hue2rgb(p, q, h);
-        b = hue2rgb(p, q, h - 1/3);
-    }
-
-    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 }
 
 function adjustGreenColor(data, enhance = true) {
@@ -1841,7 +1766,7 @@ function adjustGreenColor(data, enhance = true) {
 
 // 禁用所有操作按钮
 function disableButtons() {
-    const buttons = [encBtn, decBtn, encMultipleBtn, decMultipleBtn, restoreBtn, clearBtn, downloadBtn];
+    const buttons = [encBtn, decBtn, encMultipleBtn, decMultipleBtn, restoreBtn, clearBtn, downloadBtn, viewBtn];
     buttons.forEach(btn => {
         if (btn) {
             btn.classList.add('disabled');
@@ -1851,7 +1776,7 @@ function disableButtons() {
 
 // 启用所有操作按钮
 function enableButtons() {
-    const buttons = [encBtn, decBtn, encMultipleBtn, decMultipleBtn, restoreBtn, clearBtn, downloadBtn];
+    const buttons = [encBtn, decBtn, encMultipleBtn, decMultipleBtn, restoreBtn, clearBtn, downloadBtn, viewBtn];
     buttons.forEach(btn => {
         if (btn) {
             btn.classList.remove('disabled');
@@ -1859,7 +1784,7 @@ function enableButtons() {
     });
 }
 
-function encryptCommon(imgElement, isCompatibilityMode = false, hideButtons = true) {
+function encryptCommon(imgElement, hideButtons = true) {
     try {
         if (isProcessing) {
             showError('当前有操作正在进行，请稍后重试');
@@ -1891,12 +1816,7 @@ function encryptCommon(imgElement, isCompatibilityMode = false, hideButtons = tr
                 
                 const imgdata2 = new ImageData(width, height);
                 
-                let curve;
-                if (isCompatibilityMode) {
-                    curve = gilbert2dRecursive(width, height);
-                } else {
-                    curve = gilbert2dIterative(width, height);
-                }
+                const curve = gilbert2dIterative(width, height);
                 
                 largeObjects.curve = curve;
                 const offset = Math.round((Math.sqrt(5) - 1) / 2 * width * height);
@@ -1927,6 +1847,7 @@ function encryptCommon(imgElement, isCompatibilityMode = false, hideButtons = tr
                         hasEncrypted = true;
                         showRestoreButton();
                         updateDownloadButtonVisibility();
+                        updateViewButtonVisibility();
                         
                         if (hideButtons) {
                             encBtn.style.display = "none";
@@ -1944,16 +1865,12 @@ function encryptCommon(imgElement, isCompatibilityMode = false, hideButtons = tr
                     }
                 };
                 
-                if (isCompatibilityMode) {
-                    cvs.toBlob(processBlob, "image/jpeg", 1);
+                const format = formatSelect.value;
+                if (format === 'png') {
+                    cvs.toBlob(processBlob, "image/png");
                 } else {
-                    const format = formatSelect.value;
-                    if (format === 'png') {
-                        cvs.toBlob(processBlob, "image/png");
-                    } else {
-                        const quality = parseInt(qualityRange.value) / 100;
-                        cvs.toBlob(processBlob, "image/jpeg", quality);
-                    }
+                    const quality = parseInt(qualityRange.value) / 100;
+                    cvs.toBlob(processBlob, "image/jpeg", quality);
                 }
             } catch (error) {
                 hideLoader();
@@ -1974,7 +1891,7 @@ function encryptCommon(imgElement, isCompatibilityMode = false, hideButtons = tr
     }
 }
 
-function decryptCommon(imgElement, isCompatibilityMode = false, hideButtons = true) {
+function decryptCommon(imgElement, hideButtons = true) {
     try {
         if (isProcessing) {
             showError('当前有操作正在进行，请稍后重试');
@@ -1999,12 +1916,7 @@ function decryptCommon(imgElement, isCompatibilityMode = false, hideButtons = tr
                 largeObjects.imgData = imgdata;
                 const imgdata2 = new ImageData(width, height);
                 
-                let curve;
-                if (isCompatibilityMode) {
-                    curve = gilbert2dRecursive(width, height);
-                } else {
-                    curve = gilbert2dIterative(width, height);
-                }
+                const curve = gilbert2dIterative(width, height);
                 
                 largeObjects.curve = curve;
                 const offset = Math.round((Math.sqrt(5) - 1) / 2 * width * height);
@@ -2042,6 +1954,7 @@ function decryptCommon(imgElement, isCompatibilityMode = false, hideButtons = tr
                         hasDecrypted = true;
                         showRestoreButton();
                         updateDownloadButtonVisibility();
+                        updateViewButtonVisibility();
                         
                         if (hideButtons) {
                             decBtn.style.display = "none";
@@ -2059,16 +1972,12 @@ function decryptCommon(imgElement, isCompatibilityMode = false, hideButtons = tr
                     }
                 };
                 
-                if (isCompatibilityMode) {
-                    cvs.toBlob(processBlob, "image/jpeg", 1);
+                const format = formatSelect.value;
+                if (format === 'png') {
+                    cvs.toBlob(processBlob, "image/png");
                 } else {
-                    const format = formatSelect.value;
-                    if (format === 'png') {
-                        cvs.toBlob(processBlob, "image/png");
-                    } else {
-                        const quality = parseInt(qualityRange.value) / 100;
-                        cvs.toBlob(processBlob, "image/jpeg", quality);
-                    }
+                    const quality = parseInt(qualityRange.value) / 100;
+                    cvs.toBlob(processBlob, "image/jpeg", quality);
                 }
             } catch (error) {
                 hideLoader();
@@ -2089,13 +1998,11 @@ function decryptCommon(imgElement, isCompatibilityMode = false, hideButtons = tr
 }
 
 function encrypt(imgElement, hideButtons = true) {
-    const isCompatibilityMode = enableTomatoCompatibility.checked;
-    encryptCommon(imgElement, isCompatibilityMode, hideButtons);
+    encryptCommon(imgElement, hideButtons);
 }
 
 function decrypt(imgElement, hideButtons = true) {
-    const isCompatibilityMode = enableTomatoCompatibility.checked;
-    decryptCommon(imgElement, isCompatibilityMode, hideButtons);
+    decryptCommon(imgElement, hideButtons);
 }
 
 function downloadImage() {
@@ -2111,9 +2018,21 @@ function downloadImage() {
     }
 }
 
+// 新增：查看图片函数
+function viewImage() {
+    try {
+        if (!img.src || img.src === '') return;
+        
+        // 在新窗口打开图片
+        window.open(img.src, '_blank');
+    } catch (error) {
+        showError('查看图片时出错: ' + error.message);
+    }
+}
+
 function getDownloadFileName() {
     try {
-        const format = enableTomatoCompatibility.checked ? 'jpg' : formatSelect.value;
+        const format = formatSelect.value;
         const prefix = hasEncrypted ? 'encrypted_' : hasDecrypted ? 'decrypted_' : 'image_';
         const timestamp = new Date().getTime();
         const extension = format === 'png' ? 'png' : 'jpg';
@@ -2158,12 +2077,12 @@ function clearImage() {
         hasImage = false;
         hasEncrypted = false;
         hasDecrypted = false;
-        hasProcessed = false;
         currentFileName = "";
         
         resetButtonStates();
         clearBtn.style.display = "none";
         downloadBtn.style.display = "none";
+        viewBtn.style.display = "none";
         
         console.log('图片已清除，资源已释放');
     } catch (error) {
@@ -2199,33 +2118,6 @@ function addWaveEffect(event, waveColor) {
     }
 }
 
-function updateCompatibilitySettings() {
-    const isCompatibilityMode = enableTomatoCompatibility.checked;
-    
-    if (isCompatibilityMode) {
-        formatSelect.value = 'jpg';
-        formatSelect.disabled = true;
-        qualityRange.value = 1;
-        qualityValue.textContent = '1';
-        qualityRange.disabled = true;
-        
-        if (formatSelect.value === 'jpg') {
-            qualityOption.style.display = 'none';
-        }
-    } else {
-        formatSelect.disabled = false;
-        qualityRange.disabled = false;
-        qualityRange.value = 95;
-        qualityValue.textContent = '95';
-        
-        if (formatSelect.value === 'jpg') {
-            qualityOption.style.display = 'block';
-        } else {
-            qualityOption.style.display = 'none';
-        }
-    }
-}
-
 const buttons = [
     { element: document.querySelector('.file-button'), color: 'rgba(106, 17, 203, 0.9)' },
     { element: encBtn, color: 'rgba(30, 144, 255, 0.9)' },
@@ -2235,6 +2127,7 @@ const buttons = [
     { element: restoreBtn, color: 'rgba(255, 140, 0, 0.9)' },
     { element: clearBtn, color: 'rgba(50, 205, 50, 0.9)' },
     { element: downloadBtn, color: 'rgba(0, 191, 255, 0.9)' },
+    { element: viewBtn, color: 'rgba(138, 43, 226, 0.9)' }, // 新增的查看图片按钮
     { element: clearErrorsBtn, color: 'rgba(255, 140, 0, 0.9)' },
     { element: copyErrorsBtn, color: 'rgba(30, 144, 255, 0.9)' },
     { element: openErrorWindowBtn, color: 'rgba(106, 17, 203, 0.9)' }
@@ -2266,6 +2159,7 @@ ipt.onchange = () => {
             currentFileName = ipt.files[0].name;
             clearBtn.style.display = "flex";
             downloadBtn.style.display = "none";
+            viewBtn.style.display = "none";
         }
     } catch (error) {
         showError('选择图片时出错: ' + error.message);
@@ -2333,6 +2227,7 @@ restoreBtn.onclick = () => {
             setImageSrc(fileURL);
             hasImage = true;
             downloadBtn.style.display = "none";
+            viewBtn.style.display = "none";
         }
     } catch (error) {
         showError('还原原图时出错: ' + error.message);
@@ -2343,13 +2238,18 @@ downloadBtn.onclick = () => {
     downloadImage();
 };
 
+// 新增：查看图片按钮点击事件
+viewBtn.onclick = () => {
+    viewImage();
+};
+
 clearBtn.onclick = () => {
     clearImage();
 };
 
 formatSelect.addEventListener('change', function() {
     try {
-        if(this.value === 'jpg' && !enableTomatoCompatibility.checked) {
+        if(this.value === 'jpg') {
             qualityOption.style.display = 'block';
         } else {
             qualityOption.style.display = 'none';
@@ -2366,15 +2266,6 @@ qualityRange.addEventListener('input', debounce(function() {
         showError('更新质量滑块值时出错: ' + error.message);
     }
 }, 100));
-
-enableTomatoCompatibility.addEventListener('change', function() {
-    try {
-        updateCompatibilitySettings();
-        console.log('兼容小番茄设置已' + (this.checked ? '开启' : '关闭'));
-    } catch (error) {
-        showError('更新兼容设置时出错: ' + error.message);
-    }
-});
 
 qualityValue.textContent = qualityRange.value;
 
@@ -2407,12 +2298,6 @@ document.addEventListener('visibilitychange', function() {
 if (showErrors) {
     showErrors.checked = false;
     console.log('开发者设置已初始化：弹出报错信息默认关闭');
-}
-
-if (enableTomatoCompatibility) {
-    enableTomatoCompatibility.checked = false;
-    updateCompatibilitySettings();
-    console.log('兼容设置已初始化：兼容小番茄混淆处理默认关闭');
 }
 </script>
 </body>
