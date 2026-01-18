@@ -437,93 +437,6 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
-        /* 修改后的开发信息板块样式 - 与页面风格一致 */
-        .dev-info-options {
-            background-color: rgba(30, 30, 50, 0.8);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 2px solid rgba(50, 205, 50, 0.5);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .dev-info-summary {
-            color: #a0ffa0;
-            font-weight: 600;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-        }
-        
-        .dev-info-summary::after {
-            content: "▼";
-            font-size: 14px;
-            transition: transform 0.3s ease;
-            color: #32cd32;
-        }
-        
-        .dev-info-options[open] .dev-info-summary::after {
-            transform: rotate(180deg);
-        }
-        
-        .dev-info-content {
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-        }
-        
-        .dev-info-item {
-            margin-bottom: 15px;
-            padding: 12px 15px;
-            border-radius: 10px;
-            background-color: rgba(255, 255, 255, 0.05);
-            transition: background-color 0.2s ease;
-            display: flex;
-            align-items: center;
-        }
-        
-        .dev-info-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .dev-info-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        .dev-info-label {
-            color: #c0ffc0;
-            font-weight: 600;
-            font-size: 15px;
-            min-width: 120px;
-            text-align: left;
-        }
-        
-        .dev-info-value {
-            color: #ffffff;
-            font-weight: 500;
-            font-size: 15px;
-            flex: 1;
-            text-align: left;
-            margin-left: 10px;
-        }
-        
-        .dev-info-tool {
-            color: #ffcc80;
-            font-weight: 600;
-            font-size: 16px;
-            text-align: center;
-            padding: 15px;
-            background-color: rgba(50, 205, 50, 0.2);
-            border-radius: 10px;
-            margin-top: 10px;
-            border: 1px solid rgba(50, 205, 50, 0.3);
-        }
-        
         .settings-summary {
             color: #ffd9e6;
             font-weight: 600;
@@ -1054,7 +967,7 @@
                 margin-bottom: 20px;
             }
             
-            .file-selector, .format-options, .settings-options, .dev-info-options {
+            .file-selector, .format-options, .settings-options {
                 padding: 20px;
                 margin-bottom: 20px;
             }
@@ -1143,15 +1056,6 @@
                 flex: 1;
                 padding: 12px 10px;
             }
-            
-            .dev-info-label {
-                min-width: 100px;
-                font-size: 14px;
-            }
-            
-            .dev-info-value {
-                font-size: 14px;
-            }
         }
         
         @media (max-width: 400px) {
@@ -1217,20 +1121,6 @@
                 height: 120px;
                 left: 65px;
                 top: 65px;
-            }
-            
-            .dev-info-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .dev-info-label {
-                min-width: auto;
-                margin-bottom: 5px;
-            }
-            
-            .dev-info-value {
-                margin-left: 0;
             }
         }
     </style>
@@ -1349,26 +1239,6 @@
                 </details>
             </div>
         </details>
-        
-        <!-- 开发信息板块 -->
-        <details class="dev-info-options">
-            <summary class="dev-info-summary">开发信息</summary>
-            <div class="dev-info-content">
-                <div class="dev-info-item">
-                    <div class="dev-info-label">开发者:</div>
-                    <div class="dev-info-value">Gascy</div>
-                </div>
-                <div class="dev-info-item">
-                    <div class="dev-info-label">协助开发者:</div>
-                    <div class="dev-info-value">ctnBobong32</div>
-                </div>
-                <div class="dev-info-item">
-                    <div class="dev-info-label">开发者QQ:</div>
-                    <div class="dev-info-value">2825951507</div>
-                </div>
-                <div class="dev-info-tool">图片混淆和解混淆工具˃ʍ˂</div>
-            </div>
-        </details>
     </div>
     
 <script>
@@ -1468,9 +1338,10 @@ const errorClose = document.getElementById("error-close");
 const copyErrorsBtn = document.getElementById("copy-errors");
 const clearErrorsBtn = document.getElementById("clear-errors");
 
-// 改进的错误处理系统
+// 简化错误处理系统
 let errorMessages = [];
 
+// 简化的错误显示函数
 function showError(message) {
     try {
         if (typeof message !== 'string') {
@@ -1506,6 +1377,7 @@ function showError(message) {
     }
 }
 
+// 简化的错误显示更新
 function updateErrorDisplay() {
     try {
         if (!errorContent) return;
@@ -1517,15 +1389,19 @@ function updateErrorDisplay() {
     }
 }
 
+// 清除所有错误
 function clearAllErrors() {
     errorMessages = [];
     updateErrorDisplay();
+    console.log('所有错误记录已清除');
 }
 
+// 复制所有错误
 function copyAllErrors() {
     try {
         const allErrors = errorMessages.join('\n');
         navigator.clipboard.writeText(allErrors).then(() => {
+            console.log('错误信息已复制到剪贴板');
         }).catch(err => {
             console.error('复制失败:', err);
             showError('复制失败: ' + err.message);
@@ -1535,6 +1411,7 @@ function copyAllErrors() {
     }
 }
 
+// 关闭错误窗口
 function closeErrorWindow() {
     try {
         if (errorOverlay) {
@@ -1545,6 +1422,7 @@ function closeErrorWindow() {
     }
 }
 
+// 打开错误窗口
 function openErrorWindow() {
     try {
         if (errorOverlay) {
@@ -1579,59 +1457,28 @@ window.addEventListener('unhandledrejection', function(event) {
     showError('未处理的Promise拒绝: ' + errorMsg);
 });
 
-// =================== 改进的内存管理 ===================
-
-// 改进的blob URL管理
-let activeBlobURLs = new Set(); // 改用Set避免重复
-let currentBlobURL = null; // 当前显示图片的blob URL
+// 简化的blob URL管理
+let activeBlobURLs = [];
 
 function addBlobURL(url) {
     if (typeof url === 'string' && url.startsWith('blob:')) {
-        // 如果已经有相同的URL，先移除旧的
-        if (activeBlobURLs.has(url)) {
-            try {
-                URL.revokeObjectURL(url);
-                activeBlobURLs.delete(url);
-            } catch (e) {
-            }
-        }
-        
-        activeBlobURLs.add(url);
-        currentBlobURL = url;
+        activeBlobURLs.push(url);
     }
-}
-
-function releaseBlobURL(url) {
-    try {
-        if (typeof url === 'string' && url.startsWith('blob:')) {
-            URL.revokeObjectURL(url);
-            activeBlobURLs.delete(url);
-            
-            if (currentBlobURL === url) {
-                currentBlobURL = null;
-            }
-            
-            return true;
-        }
-    } catch (e) {
-    }
-    return false;
 }
 
 function releaseAllBlobURLs() {
     try {
         let releasedCount = 0;
-        const urlsToRelease = Array.from(activeBlobURLs);
-        
-        for (const url of urlsToRelease) {
-            if (releaseBlobURL(url)) {
+        for (const url of activeBlobURLs) {
+            try {
+                URL.revokeObjectURL(url);
                 releasedCount++;
+            } catch (e) {
+                console.warn('释放blob URL失败:', e);
             }
         }
-        
-        activeBlobURLs.clear();
-        currentBlobURL = null;
-        
+        activeBlobURLs = [];
+        console.log(`释放了 ${releasedCount} 个blob URLs`);
         return releasedCount;
     } catch (error) {
         console.error('释放blob URL时出错:', error);
@@ -1639,117 +1486,34 @@ function releaseAllBlobURLs() {
     }
 }
 
-// 改进的大对象管理
 let largeObjects = {
     canvas: null,
     imgData: null,
     curve: null
 };
 
-// 改进的releaseLargeObjects函数
 function releaseLargeObjects() {
     try {
-        // 1. 首先释放canvas资源
         if (largeObjects.canvas) {
-            try {
-                const ctx = largeObjects.canvas.getContext('2d');
-                if (ctx) {
-                    // 清除画布内容
-                    ctx.clearRect(0, 0, largeObjects.canvas.width, largeObjects.canvas.height);
-                    // 释放画布上下文
-                    try {
-                        // 强制canvas重置尺寸来释放GPU内存
-                        largeObjects.canvas.width = 0;
-                        largeObjects.canvas.height = 0;
-                    } catch (e) {
-                        // 忽略可能的错误
-                    }
-                }
-                
-                // 移除canvas的所有事件监听器（如果有）
-                const newCanvas = largeObjects.canvas.cloneNode(false);
-                if (largeObjects.canvas.parentNode) {
-                    largeObjects.canvas.parentNode.replaceChild(newCanvas, largeObjects.canvas);
-                }
-                
-                // 显式断开引用
-                largeObjects.canvas = null;
-                
-            } catch (e) {
-                largeObjects.canvas = null;
-            }
-        }
-        
-        // 2. 释放ImageData（通过置空引用来帮助垃圾回收）
-        if (largeObjects.imgData) {
-            // 对于大型图像数据，可以尝试手动释放内存
-            if (largeObjects.imgData.data && largeObjects.imgData.data.length > 1000000) {
-                // 对于超过1百万像素的图像数据，强制清除
+            const ctx = largeObjects.canvas.getContext('2d');
+            if (ctx) {
                 try {
-                    // 创建一个小的临时数组来替换大数据
-                    const tempArray = new Uint8ClampedArray(4);
-                    largeObjects.imgData.data.set(tempArray);
+                    ctx.clearRect(0, 0, largeObjects.canvas.width, largeObjects.canvas.height);
                 } catch (e) {
-                    // 忽略错误
+                    // 忽略清除错误
                 }
             }
-            largeObjects.imgData = null;
+            largeObjects.canvas = null;
         }
         
-        // 3. 释放曲线数据
-        if (largeObjects.curve) {
-            // 对于大型曲线数组，可以强制清空
-            if (largeObjects.curve.length > 100000) {
-                largeObjects.curve.length = 0; // 清空数组
-            }
-            largeObjects.curve = null;
-        }
-        
-        // 4. 强制垃圾回收提示（如果浏览器支持）
-        if (window.gc) {
-            try {
-                window.gc();
-            } catch (e) {
-                // 忽略错误
-            }
-        }
-        
-        // 5. 释放JavaScript引擎内存
-        if (globalThis.gc && typeof globalThis.gc === 'function') {
-            try {
-                globalThis.gc();
-            } catch (e) {
-                // 忽略错误
-            }
-        }
+        largeObjects.imgData = null;
+        largeObjects.curve = null;
         
     } catch (error) {
         console.error('释放大对象时出错:', error);
-        // 确保所有引用都被清除
         largeObjects.canvas = null;
         largeObjects.imgData = null;
         largeObjects.curve = null;
-    }
-}
-
-// 新增：定期清理函数
-function scheduleMemoryCleanup() {
-    // 如果对象太大或blob URLs太多，进行清理
-    const shouldCleanup = 
-        (largeObjects.imgData && largeObjects.imgData.data && largeObjects.imgData.data.length > 5000000) || // 大于5百万像素
-        (largeObjects.curve && largeObjects.curve.length > 500000) || // 大于50万点
-        activeBlobURLs.size > 5; // 超过5个blob URLs
-    
-    if (shouldCleanup) {
-        releaseLargeObjects();
-        
-        // 保留当前blob URL，释放其他的
-        if (currentBlobURL) {
-            const urlsToRelease = Array.from(activeBlobURLs).filter(url => url !== currentBlobURL);
-            urlsToRelease.forEach(url => releaseBlobURL(url));
-        } else {
-            releaseAllBlobURLs();
-        }
     }
 }
 
@@ -1801,24 +1565,12 @@ function setImageSrc(src) {
                 img.style.display = "none";
                 img.src = "";
             }
-            // 释放当前blob URL
-            if (currentBlobURL) {
-                releaseBlobURL(currentBlobURL);
-            }
             return;
         }
         
-        // 如果不是blob URL（比如data URL），释放所有blob URLs
-        if (!src.startsWith('blob:')) {
-            releaseAllBlobURLs();
-        }
+        releaseAllBlobURLs();
         
-        // 如果是blob URL，先释放旧的再添加新的
         if (typeof src === 'string' && src.startsWith('blob:')) {
-            // 释放之前的blob URLs（保留当前）
-            const urlsToRelease = Array.from(activeBlobURLs).filter(url => url !== src);
-            urlsToRelease.forEach(url => releaseBlobURL(url));
-            
             addBlobURL(src);
         }
         
@@ -1826,10 +1578,6 @@ function setImageSrc(src) {
             img.onerror = function() {
                 showError('图片加载失败');
                 hideLoader();
-                // 加载失败时释放blob URL
-                if (src.startsWith('blob:')) {
-                    releaseBlobURL(src);
-                }
             };
             
             img.onload = function() {
@@ -1837,7 +1585,7 @@ function setImageSrc(src) {
                     img.style.display = "block";
                 }
                 // 图片完全加载后再隐藏加载动画
-                setTimeout(hideLoader, 100);
+                setTimeout(hideLoader, 100); // 添加小的延迟确保图片显示
             };
             
             img.src = src;
@@ -1846,10 +1594,6 @@ function setImageSrc(src) {
     } catch (error) {
         showError('设置图片源时出错: ' + error.message);
         hideLoader();
-        // 出错时释放blob URL
-        if (src && src.startsWith('blob:')) {
-            releaseBlobURL(src);
-        }
     }
 }
 
@@ -2032,7 +1776,6 @@ async function encryptCommon(imgElement, hideButtons = true) {
         const signal = abortController.signal;
         
         try {
-            // 在处理前释放大对象
             releaseLargeObjects();
             
             const cvs = document.createElement("canvas");
@@ -2112,11 +1855,7 @@ async function encryptCommon(imgElement, hideButtons = true) {
                             if (encMultipleBtn) encMultipleBtn.style.display = "none";
                         }
                         
-                        // 处理完成后立即释放大对象
-                        setTimeout(() => {
-                            releaseLargeObjects();
-                        }, 500);
-                        
+                        releaseLargeObjects();
                         resolve(blobURL);
                     } catch (error) {
                         reject(error);
@@ -2134,8 +1873,6 @@ async function encryptCommon(imgElement, hideButtons = true) {
         } catch (error) {
             // 处理过程中出错，隐藏加载动画
             hideLoader();
-            // 确保释放大对象
-            releaseLargeObjects();
             throw error;
         }
         
@@ -2167,7 +1904,6 @@ async function decryptCommon(imgElement, hideButtons = true) {
         const signal = abortController.signal;
         
         try {
-            // 在处理前释放大对象
             releaseLargeObjects();
             
             const cvs = document.createElement("canvas");
@@ -2249,11 +1985,7 @@ async function decryptCommon(imgElement, hideButtons = true) {
                             if (decMultipleBtn) decMultipleBtn.style.display = "none";
                         }
                         
-                        // 处理完成后立即释放大对象
-                        setTimeout(() => {
-                            releaseLargeObjects();
-                        }, 500);
-                        
+                        releaseLargeObjects();
                         resolve(blobURL);
                     } catch (error) {
                         reject(error);
@@ -2271,8 +2003,6 @@ async function decryptCommon(imgElement, hideButtons = true) {
         } catch (error) {
             // 处理过程中出错，隐藏加载动画
             hideLoader();
-            // 确保释放大对象
-            releaseLargeObjects();
             throw error;
         }
         
@@ -2303,8 +2033,7 @@ function cancelCurrentOperation() {
         hideLoader();
         isProcessing = false;
         enableButtons();
-        // 取消时释放大对象
-        releaseLargeObjects();
+        console.log('当前操作已取消');
     }
 }
 
@@ -2361,7 +2090,6 @@ function clearImage() {
             img.src = "";
         }
         
-        // 彻底释放所有资源
         releaseAllBlobURLs();
         releaseLargeObjects();
         
@@ -2380,12 +2108,7 @@ function clearImage() {
         if (downloadBtn) downloadBtn.style.display = "none";
         if (viewBtn) viewBtn.style.display = "none";
         
-        // 强制垃圾回收提示
-        if (window.gc) {
-            try {
-                window.gc();
-            } catch (e) {}
-        }
+        console.log('图片已清除，资源已释放');
     } catch (error) {
         showError('清除图片时出错: ' + error.message);
     }
@@ -2467,10 +2190,6 @@ if (ipt) {
                 ipt.value = "";
                 return;
             }
-            
-            // 先释放之前的资源
-            releaseAllBlobURLs();
-            releaseLargeObjects();
             
             const fileURL = URL.createObjectURL(file);
             setImageSrc(fileURL);
@@ -2556,10 +2275,6 @@ if (restoreBtn) {
             if (ipt && ipt.files && ipt.files.length > 0) {
                 resetButtonStates();
                 if (img) img.style.display = "none";
-                
-                // 释放之前的blob URLs
-                releaseAllBlobURLs();
-                
                 const fileURL = URL.createObjectURL(ipt.files[0]);
                 setImageSrc(fileURL);
                 hasImage = true;
@@ -2636,16 +2351,9 @@ window.addEventListener('beforeunload', function(event) {
     }
 });
 
-// 添加页面隐藏时的内存清理
-document.addEventListener('visibilitychange', function() {
-    if (document.hidden) {
-        // 页面隐藏时执行内存清理
-        scheduleMemoryCleanup();
-    }
-});
-
 if (showErrors) {
     showErrors.checked = false;
+    console.log('开发者设置已初始化：弹出报错信息默认关闭');
 }
 
 if (formatSelect && qualityOption) {
