@@ -649,19 +649,17 @@
             gap: 15px;
         }
         
-        /* 修改滑块样式 - 单色半透明背景 */
         #quality-range {
             flex: 1;
             max-width: 200px;
             height: 10px;
             -webkit-appearance: none;
             appearance: none;
-            background: rgba(142, 45, 226, 0.5);
+            background: linear-gradient(to right, #4f1787, #8e2de2);
             border-radius: 10px;
             outline: none;
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         #quality-range:disabled {
@@ -708,113 +706,12 @@
             font-weight: bold;
             font-size: 18px;
             color: white;
-            background: rgba(142, 45, 226, 0.5);
+            background: linear-gradient(135deg, #8e2de2, #4f1787);
             padding: 8px 15px;
             border-radius: 10px;
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        /* 强度按钮选择器样式 */
-        .strength-button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .strength-label {
-            color: #ffffff;
-            font-weight: 600;
-            font-size: 15px;
-            text-align: left;
-            margin-bottom: 5px;
-        }
-        
-        /* 混淆强度按钮样式 - 蓝色系 */
-        .encrypt-strength-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: space-between;
-        }
-        
-        .encrypt-strength-button {
-            flex: 1;
-            min-width: 60px;
-            height: 45px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background-color: rgba(30, 144, 255, 0.3);
-            color: #d9e6ff;
-        }
-        
-        .encrypt-strength-button:hover:not(.selected):not(.disabled) {
-            background-color: rgba(30, 144, 255, 0.5);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(30, 144, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.4);
-        }
-        
-        .encrypt-strength-button.selected {
-            background-color: rgba(30, 144, 255, 0.8);
-            border-color: rgba(30, 144, 255, 0.9);
-            box-shadow: 0 0 15px rgba(30, 144, 255, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        /* 解混淆强度按钮样式 - 红色系 */
-        .decrypt-strength-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: space-between;
-        }
-        
-        .decrypt-strength-button {
-            flex: 1;
-            min-width: 60px;
-            height: 45px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background-color: rgba(220, 20, 60, 0.3);
-            color: #ffd9e6;
-        }
-        
-        .decrypt-strength-button:hover:not(.selected):not(.disabled) {
-            background-color: rgba(220, 20, 60, 0.5);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(220, 20, 60, 0.3);
-            border-color: rgba(255, 255, 255, 0.4);
-        }
-        
-        .decrypt-strength-button.selected {
-            background-color: rgba(220, 20, 60, 0.8);
-            border-color: rgba(220, 20, 60, 0.9);
-            box-shadow: 0 0 15px rgba(220, 20, 60, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
         }
         
         .loader {
@@ -959,9 +856,7 @@
         .action-button .wave,
         .circle-button .wave,
         .copy-button .wave,
-        .clear-errors-button .wave,
-        .encrypt-strength-button .wave,
-        .decrypt-strength-button .wave {
+        .clear-errors-button .wave {
             position: absolute;
             width: 20px;
             height: 20px;
@@ -1257,13 +1152,6 @@
             .dev-info-value {
                 font-size: 14px;
             }
-            
-            .encrypt-strength-button,
-            .decrypt-strength-button {
-                min-width: 50px;
-                height: 40px;
-                font-size: 15px;
-            }
         }
         
         @media (max-width: 400px) {
@@ -1343,18 +1231,6 @@
             
             .dev-info-value {
                 margin-left: 0;
-            }
-            
-            .encrypt-strength-button,
-            .decrypt-strength-button {
-                min-width: 45px;
-                height: 35px;
-                font-size: 14px;
-            }
-            
-            .encrypt-strength-buttons,
-            .decrypt-strength-buttons {
-                gap: 5px;
             }
         }
     </style>
@@ -1446,18 +1322,6 @@
                             <input type="checkbox" id="enable-green" class="setting-checkbox">
                             <label for="enable-green">绿图 (增强绿色80%)</label>
                         </div>
-                        <div class="setting-item">
-                            <div class="strength-button-group">
-                                <div class="strength-label">混淆强度:</div>
-                                <div class="encrypt-strength-buttons">
-                                    <button class="encrypt-strength-button" data-value="0.0">0.0</button>
-                                    <button class="encrypt-strength-button" data-value="0.5">0.5</button>
-                                    <button class="encrypt-strength-button selected" data-value="1.0">1.0</button>
-                                    <button class="encrypt-strength-button" data-value="1.5">1.5</button>
-                                    <button class="encrypt-strength-button" data-value="2.0">2.0</button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </details>
                 
@@ -1467,18 +1331,6 @@
                         <div class="setting-item">
                             <input type="checkbox" id="reduce-green" class="setting-checkbox">
                             <label for="reduce-green">减弱绿色效果</label>
-                        </div>
-                        <div class="setting-item">
-                            <div class="strength-button-group">
-                                <div class="strength-label">解混淆强度:</div>
-                                <div class="decrypt-strength-buttons">
-                                    <button class="decrypt-strength-button" data-value="0.0">0.0</button>
-                                    <button class="decrypt-strength-button" data-value="0.5">0.5</button>
-                                    <button class="decrypt-strength-button selected" data-value="1.0">1.0</button>
-                                    <button class="decrypt-strength-button" data-value="1.5">1.5</button>
-                                    <button class="decrypt-strength-button" data-value="2.0">2.0</button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </details>
@@ -1615,54 +1467,6 @@ const errorContent = document.getElementById("error-content");
 const errorClose = document.getElementById("error-close");
 const copyErrorsBtn = document.getElementById("copy-errors");
 const clearErrorsBtn = document.getElementById("clear-errors");
-
-// 混淆强度和解混淆强度变量（1.0为默认强度）
-let encryptStrength = 1.0;
-let decryptStrength = 1.0;
-
-// 初始化强度按钮
-function initStrengthButtons() {
-    try {
-        // 混淆强度按钮
-        const encryptButtons = document.querySelectorAll('.encrypt-strength-button');
-        encryptButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                // 添加波浪效果
-                addWaveEffect(e, 'rgba(30, 144, 255, 0.9)');
-                
-                // 获取强度值
-                const value = parseFloat(this.getAttribute('data-value'));
-                encryptStrength = value;
-                
-                // 移除所有按钮的选中状态
-                encryptButtons.forEach(btn => btn.classList.remove('selected'));
-                // 添加当前按钮的选中状态
-                this.classList.add('selected');
-            });
-        });
-        
-        // 解混淆强度按钮
-        const decryptButtons = document.querySelectorAll('.decrypt-strength-button');
-        decryptButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                // 添加波浪效果
-                addWaveEffect(e, 'rgba(220, 20, 60, 0.9)');
-                
-                // 获取强度值
-                const value = parseFloat(this.getAttribute('data-value'));
-                decryptStrength = value;
-                
-                // 移除所有按钮的选中状态
-                decryptButtons.forEach(btn => btn.classList.remove('selected'));
-                // 添加当前按钮的选中状态
-                this.classList.add('selected');
-            });
-        });
-        
-    } catch (error) {
-        console.error('初始化强度按钮时出错:', error);
-    }
-}
 
 // 改进的错误处理系统
 let errorMessages = [];
@@ -2251,8 +2055,7 @@ async function encryptCommon(imgElement, hideButtons = true) {
             largeObjects.curve = curve;
             
             const totalPixels = width * height;
-            // 使用混淆强度系数计算偏移量
-            const offset = Math.round(encryptStrength * (Math.sqrt(5) - 1) / 2 * totalPixels);
+            const offset = Math.round((Math.sqrt(5) - 1) / 2 * totalPixels);
             
             await processImageInChunks(
                 totalPixels,
@@ -2382,8 +2185,7 @@ async function decryptCommon(imgElement, hideButtons = true) {
             largeObjects.curve = curve;
             
             const totalPixels = width * height;
-            // 使用解混淆强度系数计算偏移量
-            const offset = Math.round(decryptStrength * (Math.sqrt(5) - 1) / 2 * totalPixels);
+            const offset = Math.round((Math.sqrt(5) - 1) / 2 * totalPixels);
             
             await processImageInChunks(
                 totalPixels,
@@ -2642,19 +2444,6 @@ buttons.forEach(button => {
     }
 });
 
-// 为强度按钮添加波浪效果
-document.querySelectorAll('.encrypt-strength-button').forEach(button => {
-    button.addEventListener('click', (e) => {
-        addWaveEffect(e, 'rgba(30, 144, 255, 0.9)');
-    });
-});
-
-document.querySelectorAll('.decrypt-strength-button').forEach(button => {
-    button.addEventListener('click', (e) => {
-        addWaveEffect(e, 'rgba(220, 20, 60, 0.9)');
-    });
-});
-
 const ipt = document.getElementById("ipt");
 if (ipt) {
     ipt.onchange = () => {
@@ -2866,9 +2655,6 @@ if (formatSelect && qualityOption) {
         qualityOption.style.display = 'none';
     }
 }
-
-// 初始化强度按钮
-initStrengthButtons();
 
 resetButtonStates();
 </script>
