@@ -1577,15 +1577,12 @@ function setImageSrc(src) {
         if (img) {
             img.onerror = function() {
                 showError('图片加载失败');
-                hideLoader();
             };
             
             img.onload = function() {
                 if (img) {
                     img.style.display = "block";
                 }
-                // 图片完全加载后再隐藏加载动画
-                setTimeout(hideLoader, 100); // 添加小的延迟确保图片显示
             };
             
             img.src = src;
@@ -1593,7 +1590,6 @@ function setImageSrc(src) {
         
     } catch (error) {
         showError('设置图片源时出错: ' + error.message);
-        hideLoader();
     }
 }
 
@@ -1839,11 +1835,7 @@ async function encryptCommon(imgElement, hideButtons = true) {
                         }
                         
                         const blobURL = URL.createObjectURL(blob);
-                        
-                        // 设置图片源，等待图片加载完成
                         setImageSrc(blobURL);
-                        
-                        // 注意：加载动画将在图片加载完成后由setImageSrc函数隐藏
                         
                         hasEncrypted = true;
                         showRestoreButton();
@@ -1871,8 +1863,6 @@ async function encryptCommon(imgElement, hideButtons = true) {
             });
             
         } catch (error) {
-            // 处理过程中出错，隐藏加载动画
-            hideLoader();
             throw error;
         }
         
@@ -1882,7 +1872,7 @@ async function encryptCommon(imgElement, hideButtons = true) {
         }
         throw error;
     } finally {
-        // 注意：这里不再隐藏加载动画，因为加载动画将在图片加载完成后由setImageSrc函数隐藏
+        hideLoader();
         isProcessing = false;
         abortController = null;
         enableButtons();
@@ -1969,11 +1959,7 @@ async function decryptCommon(imgElement, hideButtons = true) {
                         }
                         
                         const blobURL = URL.createObjectURL(blob);
-                        
-                        // 设置图片源，等待图片加载完成
                         setImageSrc(blobURL);
-                        
-                        // 注意：加载动画将在图片加载完成后由setImageSrc函数隐藏
                         
                         hasDecrypted = true;
                         showRestoreButton();
@@ -2001,8 +1987,6 @@ async function decryptCommon(imgElement, hideButtons = true) {
             });
             
         } catch (error) {
-            // 处理过程中出错，隐藏加载动画
-            hideLoader();
             throw error;
         }
         
@@ -2012,7 +1996,7 @@ async function decryptCommon(imgElement, hideButtons = true) {
         }
         throw error;
     } finally {
-        // 注意：这里不再隐藏加载动画，因为加载动画将在图片加载完成后由setImageSrc函数隐藏
+        hideLoader();
         isProcessing = false;
         abortController = null;
         enableButtons();

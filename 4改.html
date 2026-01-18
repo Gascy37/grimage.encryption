@@ -285,7 +285,7 @@
         }
         
         #view {
-            background-color: rgba(138, 43, 226, 0.4);
+            background-color: rgba(138, 43, 226, 0.4); /* 紫色，与其他按钮区分 */
             color: #f0e6ff;
             display: none;
         }
@@ -1321,7 +1321,7 @@ const decMultipleBtn = document.getElementById("dec-multiple");
 const restoreBtn = document.getElementById("re");
 const clearBtn = document.getElementById("clear");
 const downloadBtn = document.getElementById("download");
-const viewBtn = document.getElementById("view");
+const viewBtn = document.getElementById("view"); // 新增的查看图片按钮
 const formatSelect = document.getElementById("format-select");
 const qualityOption = document.getElementById("quality-option");
 const qualityRange = document.getElementById("quality-range");
@@ -1338,65 +1338,98 @@ const errorClose = document.getElementById("error-close");
 const copyErrorsBtn = document.getElementById("copy-errors");
 const clearErrorsBtn = document.getElementById("clear-errors");
 
-// 简化错误处理系统
 let errorMessages = [];
+let errorDebounceTimer = null;
 
-// 简化的错误显示函数
+let hasEncrypted = false;
+let hasDecrypted = false;
+let hasImage = false;
+let currentFileName = "";
+
+let currentBlobURLs = [];
+
+let largeObjects = {
+    canvas: null,
+    imgData: null,
+    curve: null
+};
+
+// 并发控制：防止快速连续点击导致多个操作同时进行
+let isProcessing = false;
+
+function debounce(func, wait) {
+    return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(errorDebounceTimer);
+        errorDebounceTimer = setTimeout(() => {
+            func.apply(context, args);
+        }, wait);
+    };
+}
+
 function showError(message) {
+    if (typeof message !== 'string') {
+        message = String(message);
+    }
+    
+    if (message.includes('showError') && message.includes('递归')) {
+        console.error('防止递归调用:', message);
+        return;
+    }
+    
     try {
-        if (typeof message !== 'string') {
-            try {
-                message = JSON.stringify(message);
-            } catch (e) {
-                message = String(message);
-            }
-        }
-        
         const timestamp = new Date().toLocaleTimeString();
         const errorMessage = `[${timestamp}] ${message}`;
         
-        // 限制错误消息数量，防止内存泄漏
         if (errorMessages.length > 100) {
             errorMessages.shift();
         }
         
         errorMessages.push(errorMessage);
         
-        // 更新错误显示
-        updateErrorDisplay();
+        safeUpdateErrorDisplay();
         
-        // 如果设置了显示错误窗口，则显示
-        if (showErrors && showErrors.checked && errorOverlay) {
-            errorOverlay.style.display = "flex";
+        if (showErrors && showErrors.checked) {
+            setTimeout(() => {
+                try {
+                    errorOverlay.style.display = "flex";
+                } catch (e) {
+                    console.error('显示错误窗口失败:', e);
+                }
+            }, 0);
         }
         
-        console.error('应用错误:', errorMessage);
-        
+        console.error(errorMessage);
     } catch (error) {
-        console.error('显示错误时出错:', error);
+        console.error('showError函数出错:', error.message);
     }
 }
 
-// 简化的错误显示更新
-function updateErrorDisplay() {
+function safeUpdateErrorDisplay() {
     try {
-        if (!errorContent) return;
+        let html = "";
+        const maxErrors = 50;
+        const startIndex = Math.max(0, errorMessages.length - maxErrors);
         
-        errorContent.textContent = errorMessages.join('\n\n');
-        errorContent.scrollTop = errorContent.scrollHeight;
+        for (let i = startIndex; i < errorMessages.length; i++) {
+            html += errorMessages[i];
+            if (i < errorMessages.length - 1) {
+                html += '\n<div class="error-divider"></div>\n';
+            }
+        }
+        errorContent.innerHTML = html;
     } catch (error) {
         console.error('更新错误显示失败:', error);
     }
 }
 
-// 清除所有错误
 function clearAllErrors() {
     errorMessages = [];
-    updateErrorDisplay();
+    safeUpdateErrorDisplay();
     console.log('所有错误记录已清除');
 }
 
-// 复制所有错误
 function copyAllErrors() {
     try {
         const allErrors = errorMessages.join('\n');
@@ -1411,34 +1444,26 @@ function copyAllErrors() {
     }
 }
 
-// 关闭错误窗口
 function closeErrorWindow() {
     try {
-        if (errorOverlay) {
-            errorOverlay.style.display = "none";
-        }
+        errorOverlay.style.display = "none";
     } catch (error) {
         console.error('关闭错误窗口失败:', error);
     }
 }
 
-// 打开错误窗口
 function openErrorWindow() {
     try {
-        if (errorOverlay) {
-            updateErrorDisplay();
-            errorOverlay.style.display = "flex";
-        }
+        errorOverlay.style.display = "flex";
     } catch (error) {
-        console.error('打开错误窗口时出错:', error);
+        showError('打开错误窗口时出错: ' + error.message);
     }
 }
 
-// 初始化错误窗口事件
 try {
-    if (errorClose) errorClose.addEventListener('click', closeErrorWindow);
-    if (copyErrorsBtn) copyErrorsBtn.addEventListener('click', copyAllErrors);
-    if (clearErrorsBtn) clearErrorsBtn.addEventListener('click', clearAllErrors);
+    errorClose.addEventListener('click', closeErrorWindow);
+    copyErrorsBtn.addEventListener('click', copyAllErrors);
+    clearErrorsBtn.addEventListener('click', clearAllErrors);
     if (openErrorWindowBtn) {
         openErrorWindowBtn.addEventListener('click', openErrorWindow);
     }
@@ -1446,162 +1471,146 @@ try {
     console.error('初始化错误窗口事件失败:', error);
 }
 
-// 简化的全局错误处理
 window.addEventListener('error', function(event) {
-    showError(`全局错误: ${event.message} (${event.filename}:${event.lineno}:${event.colno})`);
+    event.preventDefault();
+    const errorMsg = event.error ? event.error.toString() : event.message;
+    showError('全局错误: ' + errorMsg);
+    return true;
 });
 
 window.addEventListener('unhandledrejection', function(event) {
     event.preventDefault();
     const errorMsg = event.reason ? event.reason.toString() : '未处理的Promise拒绝';
     showError('未处理的Promise拒绝: ' + errorMsg);
+    return true;
 });
-
-// 简化的blob URL管理
-let activeBlobURLs = [];
-
-function addBlobURL(url) {
-    if (typeof url === 'string' && url.startsWith('blob:')) {
-        activeBlobURLs.push(url);
-    }
-}
 
 function releaseAllBlobURLs() {
     try {
-        let releasedCount = 0;
-        for (const url of activeBlobURLs) {
-            try {
-                URL.revokeObjectURL(url);
-                releasedCount++;
-            } catch (e) {
-                console.warn('释放blob URL失败:', e);
+        currentBlobURLs.forEach(url => {
+            if (url && url.startsWith('blob:')) {
+                try {
+                    URL.revokeObjectURL(url);
+                } catch (e) {
+                    console.warn('释放blob URL失败:', e);
+                }
             }
-        }
-        activeBlobURLs = [];
-        console.log(`释放了 ${releasedCount} 个blob URLs`);
-        return releasedCount;
+        });
+        currentBlobURLs = [];
     } catch (error) {
         console.error('释放blob URL时出错:', error);
-        return 0;
     }
 }
 
-let largeObjects = {
-    canvas: null,
-    imgData: null,
-    curve: null
-};
-
 function releaseLargeObjects() {
     try {
+        // 释放canvas资源
         if (largeObjects.canvas) {
             const ctx = largeObjects.canvas.getContext('2d');
             if (ctx) {
-                try {
-                    ctx.clearRect(0, 0, largeObjects.canvas.width, largeObjects.canvas.height);
-                } catch (e) {
-                    // 忽略清除错误
+                // 清除canvas内容
+                ctx.clearRect(0, 0, largeObjects.canvas.width, largeObjects.canvas.height);
+                // 释放ImageData资源
+                if (largeObjects.imgData) {
+                    // 创建空的ImageData来替换原来的数据
+                    ctx.putImageData(new ImageData(largeObjects.canvas.width, largeObjects.canvas.height), 0, 0);
                 }
             }
+            
+            // 移除canvas元素
+            if (largeObjects.canvas.parentNode) {
+                largeObjects.canvas.parentNode.removeChild(largeObjects.canvas);
+            }
+            
+            // 显式设置canvas尺寸为0
+            largeObjects.canvas.width = 0;
+            largeObjects.canvas.height = 0;
+            
+            // 移除所有事件监听器
+            const newCanvas = largeObjects.canvas.cloneNode(false);
             largeObjects.canvas = null;
+            
+            // 如果浏览器支持，手动触发垃圾回收提示
+            if (typeof window.gc === 'function') {
+                try {
+                    window.gc();
+                } catch (e) {
+                    // 忽略gc错误
+                }
+            }
         }
         
+        // 释放ImageData资源
         largeObjects.imgData = null;
+        
+        // 释放曲线数据
         largeObjects.curve = null;
+        
+        // 强制垃圾回收提示（非标准方法，仅用于调试）
+        try {
+            if (window.CollectGarbage) {
+                window.CollectGarbage();
+            }
+        } catch (e) {
+            // 忽略错误
+        }
+        
+        // 使用requestAnimationFrame给浏览器时间进行垃圾回收
+        requestAnimationFrame(() => {
+            // 可以尝试分配和释放一些内存来提示垃圾回收器
+            const temp = new Array(1000).fill(0);
+            setTimeout(() => {
+                // 空操作，只是给垃圾回收器时间
+            }, 0);
+        });
         
     } catch (error) {
         console.error('释放大对象时出错:', error);
+        // 即使出错也继续重置变量
         largeObjects.canvas = null;
         largeObjects.imgData = null;
         largeObjects.curve = null;
     }
 }
 
-let isProcessing = false;
-let abortController = null;
-
-// 简化的图像处理分块函数
-function processImageInChunks(totalPixels, processPixel, chunkSize = 10000, checkCancel = () => false) {
-    return new Promise((resolve, reject) => {
-        let index = 0;
-        
-        function processChunk() {
-            try {
-                if (checkCancel()) {
-                    reject(new Error('操作已被取消'));
-                    return;
-                }
-                
-                const end = Math.min(index + chunkSize, totalPixels);
-                for (let i = index; i < end; i++) {
-                    processPixel(i);
-                }
-                
-                index = end;
-                
-                if (index < totalPixels) {
-                    setTimeout(processChunk, 0);
-                } else {
-                    resolve();
-                }
-            } catch (error) {
-                reject(error);
-            }
-        }
-        
-        processChunk();
-    });
-}
-
 function setImageSrc(src) {
     try {
-        if (img) {
-            img.onerror = null;
-            img.onload = null;
-        }
+        img.onerror = null;
+        img.onload = null;
         
         if (!src) {
-            if (img) {
-                img.style.display = "none";
-                img.src = "";
-            }
+            img.style.display = "none";
+            img.src = "";
             return;
         }
         
         releaseAllBlobURLs();
         
-        if (typeof src === 'string' && src.startsWith('blob:')) {
-            addBlobURL(src);
+        if (src && src.startsWith('blob:')) {
+            currentBlobURLs.push(src);
         }
         
-        if (img) {
-            img.onerror = function() {
-                showError('图片加载失败');
-                hideLoader();
-            };
-            
-            img.onload = function() {
-                if (img) {
-                    img.style.display = "block";
-                }
-                // 图片完全加载后再隐藏加载动画
-                setTimeout(hideLoader, 100); // 添加小的延迟确保图片显示
-            };
-            
-            img.src = src;
-        }
+        img.onerror = function() {
+            if (src && src !== '') {
+                const srcPreview = src.length > 100 ? src.substring(0, 100) + '...' : src;
+                showError('图片加载失败: ' + srcPreview);
+            }
+        };
+        
+        img.onload = function() {
+            img.style.display = "block";
+        };
+        
+        img.src = src;
         
     } catch (error) {
         showError('设置图片源时出错: ' + error.message);
-        hideLoader();
     }
 }
 
 function showLoader() {
     try {
-        if (loader) {
-            loader.style.display = "block";
-        }
+        loader.style.display = "block";
     } catch (error) {
         console.error('显示加载动画失败:', error);
     }
@@ -1609,30 +1618,21 @@ function showLoader() {
 
 function hideLoader() {
     try {
-        if (loader) {
-            loader.style.display = "none";
-        }
+        loader.style.display = "none";
     } catch (error) {
         console.error('隐藏加载动画失败:', error);
     }
 }
 
-let hasEncrypted = false;
-let hasDecrypted = false;
-let hasImage = false;
-let currentFileName = "";
-
 function resetButtonStates() {
     try {
         hasEncrypted = false;
         hasDecrypted = false;
-        
-        if (encBtn) encBtn.style.display = "flex";
-        if (decBtn) decBtn.style.display = "flex";
-        if (encMultipleBtn) encMultipleBtn.style.display = "flex";
-        if (decMultipleBtn) decMultipleBtn.style.display = "flex";
-        if (restoreBtn) restoreBtn.style.display = "none";
-        
+        encBtn.style.display = "flex";
+        decBtn.style.display = "flex";
+        encMultipleBtn.style.display = "flex";
+        decMultipleBtn.style.display = "flex";
+        restoreBtn.style.display = "none";
         updateDownloadButtonVisibility();
         updateViewButtonVisibility();
         enableButtons();
@@ -1643,9 +1643,7 @@ function resetButtonStates() {
 
 function showRestoreButton() {
     try {
-        if (restoreBtn) {
-            restoreBtn.style.display = "flex";
-        }
+        restoreBtn.style.display = "flex";
         updateDownloadButtonVisibility();
         updateViewButtonVisibility();
     } catch (error) {
@@ -1655,26 +1653,23 @@ function showRestoreButton() {
 
 function updateDownloadButtonVisibility() {
     try {
-        if (downloadBtn) {
-            if (hasImage && (hasEncrypted || hasDecrypted)) {
-                downloadBtn.style.display = "flex";
-            } else {
-                downloadBtn.style.display = "none";
-            }
+        if (hasImage && (hasEncrypted || hasDecrypted) && (encBtn.style.display !== "none" || decBtn.style.display !== "none")) {
+            downloadBtn.style.display = "flex";
+        } else {
+            downloadBtn.style.display = "none";
         }
     } catch (error) {
         showError('更新下载按钮可见性时出错: ' + error.message);
     }
 }
 
+// 新增：更新查看图片按钮可见性
 function updateViewButtonVisibility() {
     try {
-        if (viewBtn) {
-            if (hasImage && (hasEncrypted || hasDecrypted)) {
-                viewBtn.style.display = "flex";
-            } else {
-                viewBtn.style.display = "none";
-            }
+        if (hasImage && (hasEncrypted || hasDecrypted) && (encBtn.style.display !== "none" || decBtn.style.display !== "none")) {
+            viewBtn.style.display = "flex";
+        } else {
+            viewBtn.style.display = "none";
         }
     } catch (error) {
         showError('更新查看图片按钮可见性时出错: ' + error.message);
@@ -1715,25 +1710,51 @@ function adjustGreenColor(data, enhance = true) {
         
         let newR = r, newG = g, newB = b;
         
+        // 更精确的绿色检测，避免误判
         const isGreenish = (h >= 75 && h <= 165 && s > 8 && l > 10 && l < 90);
         
         if (enhance && isGreenish) {
-            const greenFactor = 1.0 + (Math.min(s, 70) / 100) * 0.6;
-            const redBlueFactor = Math.max(0.7, 1.0 - (Math.min(s, 70) / 100) * 0.3);
+            // 增强绿色：更自然的增强算法
+            const greenFactor = 1.0 + (Math.min(s, 70) / 100) * 0.6; // 降低增强幅度
+            const redBlueFactor = Math.max(0.7, 1.0 - (Math.min(s, 70) / 100) * 0.3); // 减少红蓝通道削减
             
             newG = Math.min(255, Math.round(g * greenFactor));
             newR = Math.max(0, Math.round(r * redBlueFactor));
             newB = Math.max(0, Math.round(b * redBlueFactor));
             
+            // 保持亮度平衡
+            const oldBrightness = 0.299 * r + 0.587 * g + 0.114 * b;
+            const newBrightness = 0.299 * newR + 0.587 * newG + 0.114 * newB;
+            
+            if (newBrightness > oldBrightness * 1.3) { // 限制亮度增加
+                const adjust = (oldBrightness * 1.3) / newBrightness;
+                newR = Math.round(newR * adjust);
+                newG = Math.round(newG * adjust);
+                newB = Math.round(newB * adjust);
+            }
+            
         } else if (!enhance && isGreenish) {
-            const greenFactor = Math.max(0.5, 1.0 - (Math.min(s, 80) / 100) * 0.5);
-            const redBlueFactor = Math.min(1.3, 1.0 + (Math.min(s, 80) / 100) * 0.3);
+            // 减弱绿色：更保守的减弱算法
+            const greenFactor = Math.max(0.5, 1.0 - (Math.min(s, 80) / 100) * 0.5); // 减少减弱幅度
+            const redBlueFactor = Math.min(1.3, 1.0 + (Math.min(s, 80) / 100) * 0.3); // 适度增强红蓝
             
             newG = Math.max(0, Math.round(g * greenFactor));
             newR = Math.min(255, Math.round(r * redBlueFactor));
             newB = Math.min(255, Math.round(b * redBlueFactor));
+            
+            // 保持整体亮度
+            const oldBrightness = 0.299 * r + 0.587 * g + 0.114 * b;
+            const newBrightness = 0.299 * newR + 0.587 * newG + 0.114 * newB;
+            
+            if (Math.abs(newBrightness - oldBrightness) > oldBrightness * 0.2) {
+                const adjust = oldBrightness / newBrightness;
+                newR = Math.round(newR * adjust);
+                newG = Math.round(newG * adjust);
+                newB = Math.round(newB * adjust);
+            }
         }
         
+        // 确保值在有效范围内
         result[i] = Math.max(0, Math.min(255, newR));
         result[i + 1] = Math.max(0, Math.min(255, newG));
         result[i + 2] = Math.max(0, Math.min(255, newB));
@@ -1743,6 +1764,7 @@ function adjustGreenColor(data, enhance = true) {
     return result;
 }
 
+// 禁用所有操作按钮
 function disableButtons() {
     const buttons = [encBtn, decBtn, encMultipleBtn, decMultipleBtn, restoreBtn, clearBtn, downloadBtn, viewBtn];
     buttons.forEach(btn => {
@@ -1752,6 +1774,7 @@ function disableButtons() {
     });
 }
 
+// 启用所有操作按钮
 function enableButtons() {
     const buttons = [encBtn, decBtn, encMultipleBtn, decMultipleBtn, restoreBtn, clearBtn, downloadBtn, viewBtn];
     buttons.forEach(btn => {
@@ -1761,7 +1784,7 @@ function enableButtons() {
     });
 }
 
-async function encryptCommon(imgElement, hideButtons = true) {
+function encryptCommon(imgElement, hideButtons = true) {
     try {
         if (isProcessing) {
             showError('当前有操作正在进行，请稍后重试');
@@ -1772,78 +1795,54 @@ async function encryptCommon(imgElement, hideButtons = true) {
         disableButtons();
         showLoader();
         
-        abortController = new AbortController();
-        const signal = abortController.signal;
-        
-        try {
-            releaseLargeObjects();
-            
-            const cvs = document.createElement("canvas");
-            largeObjects.canvas = cvs;
-            const width = cvs.width = imgElement.width;
-            const height = cvs.height = imgElement.height;
-            const ctx = cvs.getContext("2d", { willReadFrequently: true });
-            ctx.drawImage(imgElement, 0, 0);
-            
-            let imgdata = ctx.getImageData(0, 0, width, height);
-            largeObjects.imgData = imgdata;
-            
-            if (enableGreen && enableGreen.checked) {
-                const enhancedData = adjustGreenColor(imgdata.data, true);
-                imgdata.data.set(enhancedData);
-            }
-            
-            const imgdata2 = new ImageData(width, height);
-            const curve = gilbert2dIterative(width, height);
-            largeObjects.curve = curve;
-            
-            const totalPixels = width * height;
-            const offset = Math.round((Math.sqrt(5) - 1) / 2 * totalPixels);
-            
-            await processImageInChunks(
-                totalPixels,
-                (i) => {
+        // 使用setImmediate或setTimeout来避免阻塞UI
+        const executeEncrypt = () => {
+            try {
+                releaseLargeObjects();
+                
+                const cvs = document.createElement("canvas");
+                largeObjects.canvas = cvs;
+                const width = cvs.width = imgElement.width;
+                const height = cvs.height = imgElement.height;
+                const ctx = cvs.getContext("2d", { willReadFrequently: true });
+                ctx.drawImage(imgElement, 0, 0);
+                let imgdata = ctx.getImageData(0, 0, width, height);
+                largeObjects.imgData = imgdata;
+                
+                if (enableGreen.checked) {
+                    const enhancedData = adjustGreenColor(imgdata.data, true);
+                    imgdata.data.set(enhancedData);
+                }
+                
+                const imgdata2 = new ImageData(width, height);
+                
+                const curve = gilbert2dIterative(width, height);
+                
+                largeObjects.curve = curve;
+                const offset = Math.round((Math.sqrt(5) - 1) / 2 * width * height);
+                
+                // 使用更高效的方式处理像素
+                const totalPixels = width * height;
+                for(let i = 0; i < totalPixels; i++){
                     const old_pos = curve[i];
                     const new_pos = curve[(i + offset) % totalPixels];
                     const old_p = 4 * (old_pos[0] + old_pos[1] * width);
                     const new_p = 4 * (new_pos[0] + new_pos[1] * width);
                     
+                    // 直接复制4个值（RGBA）
                     imgdata2.data[new_p] = imgdata.data[old_p];
                     imgdata2.data[new_p + 1] = imgdata.data[old_p + 1];
                     imgdata2.data[new_p + 2] = imgdata.data[old_p + 2];
                     imgdata2.data[new_p + 3] = imgdata.data[old_p + 3];
-                },
-                10000,
-                () => signal.aborted
-            );
-            
-            if (signal.aborted) {
-                throw new Error('操作已被取消');
-            }
-            
-            ctx.putImageData(imgdata2, 0, 0);
-            
-            const format = formatSelect ? formatSelect.value : 'png';
-            
-            return new Promise((resolve, reject) => {
-                const onBlobCreated = (blob) => {
+                }
+                
+                ctx.putImageData(imgdata2, 0, 0);
+                
+                const processBlob = (blob) => {
                     try {
-                        if (signal.aborted) {
-                            reject(new Error('操作已被取消'));
-                            return;
-                        }
-                        
-                        if (!blob) {
-                            reject(new Error('创建blob失败'));
-                            return;
-                        }
-                        
                         const blobURL = URL.createObjectURL(blob);
-                        
-                        // 设置图片源，等待图片加载完成
                         setImageSrc(blobURL);
-                        
-                        // 注意：加载动画将在图片加载完成后由setImageSrc函数隐藏
+                        hideLoader();
                         
                         hasEncrypted = true;
                         showRestoreButton();
@@ -1851,45 +1850,48 @@ async function encryptCommon(imgElement, hideButtons = true) {
                         updateViewButtonVisibility();
                         
                         if (hideButtons) {
-                            if (encBtn) encBtn.style.display = "none";
-                            if (encMultipleBtn) encMultipleBtn.style.display = "none";
+                            encBtn.style.display = "none";
+                            encMultipleBtn.style.display = "none";
                         }
                         
                         releaseLargeObjects();
-                        resolve(blobURL);
+                        isProcessing = false;
+                        enableButtons();
                     } catch (error) {
-                        reject(error);
+                        hideLoader();
+                        showError('处理后处理时出错: ' + error.message);
+                        isProcessing = false;
+                        enableButtons();
                     }
                 };
                 
+                const format = formatSelect.value;
                 if (format === 'png') {
-                    cvs.toBlob(onBlobCreated, "image/png");
+                    cvs.toBlob(processBlob, "image/png");
                 } else {
-                    const quality = qualityRange ? parseInt(qualityRange.value) / 100 : 0.95;
-                    cvs.toBlob(onBlobCreated, "image/jpeg", quality);
+                    const quality = parseInt(qualityRange.value) / 100;
+                    cvs.toBlob(processBlob, "image/jpeg", quality);
                 }
-            });
-            
-        } catch (error) {
-            // 处理过程中出错，隐藏加载动画
-            hideLoader();
-            throw error;
-        }
+            } catch (error) {
+                hideLoader();
+                showError('加密处理时出错: ' + error.message);
+                releaseLargeObjects();
+                isProcessing = false;
+                enableButtons();
+            }
+        };
         
+        // 使用setTimeout避免阻塞UI，特别是对于大图片
+        setTimeout(executeEncrypt, 10);
     } catch (error) {
-        if (error.message !== '操作已被取消') {
-            showError('加密处理时出错: ' + error.message);
-        }
-        throw error;
-    } finally {
-        // 注意：这里不再隐藏加载动画，因为加载动画将在图片加载完成后由setImageSrc函数隐藏
+        hideLoader();
+        showError('加密函数调用时出错: ' + error.message);
         isProcessing = false;
-        abortController = null;
         enableButtons();
     }
 }
 
-async function decryptCommon(imgElement, hideButtons = true) {
+function decryptCommon(imgElement, hideButtons = true) {
     try {
         if (isProcessing) {
             showError('当前有操作正在进行，请稍后重试');
@@ -1900,80 +1902,54 @@ async function decryptCommon(imgElement, hideButtons = true) {
         disableButtons();
         showLoader();
         
-        abortController = new AbortController();
-        const signal = abortController.signal;
-        
-        try {
-            releaseLargeObjects();
-            
-            const cvs = document.createElement("canvas");
-            largeObjects.canvas = cvs;
-            const width = cvs.width = imgElement.width;
-            const height = cvs.height = imgElement.height;
-            const ctx = cvs.getContext("2d", { willReadFrequently: true });
-            ctx.drawImage(imgElement, 0, 0);
-            
-            let imgdata = ctx.getImageData(0, 0, width, height);
-            largeObjects.imgData = imgdata;
-            const imgdata2 = new ImageData(width, height);
-            
-            const curve = gilbert2dIterative(width, height);
-            largeObjects.curve = curve;
-            
-            const totalPixels = width * height;
-            const offset = Math.round((Math.sqrt(5) - 1) / 2 * totalPixels);
-            
-            await processImageInChunks(
-                totalPixels,
-                (i) => {
+        const executeDecrypt = () => {
+            try {
+                releaseLargeObjects();
+                
+                const cvs = document.createElement("canvas");
+                largeObjects.canvas = cvs;
+                const width = cvs.width = imgElement.width;
+                const height = cvs.height = imgElement.height;
+                const ctx = cvs.getContext("2d", { willReadFrequently: true });
+                ctx.drawImage(imgElement, 0, 0);
+                let imgdata = ctx.getImageData(0, 0, width, height);
+                largeObjects.imgData = imgdata;
+                const imgdata2 = new ImageData(width, height);
+                
+                const curve = gilbert2dIterative(width, height);
+                
+                largeObjects.curve = curve;
+                const offset = Math.round((Math.sqrt(5) - 1) / 2 * width * height);
+                
+                // 使用更高效的方式处理像素
+                const totalPixels = width * height;
+                for(let i = 0; i < totalPixels; i++){
                     const old_pos = curve[i];
                     const new_pos = curve[(i + offset) % totalPixels];
                     const old_p = 4 * (old_pos[0] + old_pos[1] * width);
                     const new_p = 4 * (new_pos[0] + new_pos[1] * width);
                     
+                    // 直接复制4个值（RGBA）
                     imgdata2.data[old_p] = imgdata.data[new_p];
                     imgdata2.data[old_p + 1] = imgdata.data[new_p + 1];
                     imgdata2.data[old_p + 2] = imgdata.data[new_p + 2];
                     imgdata2.data[old_p + 3] = imgdata.data[new_p + 3];
-                },
-                10000,
-                () => signal.aborted
-            );
-            
-            if (signal.aborted) {
-                throw new Error('操作已被取消');
-            }
-            
-            let finalData = new Uint8ClampedArray(imgdata2.data);
-            
-            if (reduceGreen && reduceGreen.checked) {
-                finalData = adjustGreenColor(finalData, false);
-            }
-            
-            imgdata2.data.set(finalData);
-            ctx.putImageData(imgdata2, 0, 0);
-            
-            const format = formatSelect ? formatSelect.value : 'png';
-            
-            return new Promise((resolve, reject) => {
-                const onBlobCreated = (blob) => {
+                }
+                
+                let finalData = new Uint8ClampedArray(imgdata2.data);
+                
+                if (reduceGreen.checked) {
+                    finalData = adjustGreenColor(finalData, false);
+                }
+                
+                imgdata2.data.set(finalData);
+                ctx.putImageData(imgdata2, 0, 0);
+                
+                const processBlob = (blob) => {
                     try {
-                        if (signal.aborted) {
-                            reject(new Error('操作已被取消'));
-                            return;
-                        }
-                        
-                        if (!blob) {
-                            reject(new Error('创建blob失败'));
-                            return;
-                        }
-                        
                         const blobURL = URL.createObjectURL(blob);
-                        
-                        // 设置图片源，等待图片加载完成
                         setImageSrc(blobURL);
-                        
-                        // 注意：加载动画将在图片加载完成后由setImageSrc函数隐藏
+                        hideLoader();
                         
                         hasDecrypted = true;
                         showRestoreButton();
@@ -1981,65 +1957,57 @@ async function decryptCommon(imgElement, hideButtons = true) {
                         updateViewButtonVisibility();
                         
                         if (hideButtons) {
-                            if (decBtn) decBtn.style.display = "none";
-                            if (decMultipleBtn) decMultipleBtn.style.display = "none";
+                            decBtn.style.display = "none";
+                            decMultipleBtn.style.display = "none";
                         }
                         
                         releaseLargeObjects();
-                        resolve(blobURL);
+                        isProcessing = false;
+                        enableButtons();
                     } catch (error) {
-                        reject(error);
+                        hideLoader();
+                        showError('处理后处理时出错: ' + error.message);
+                        isProcessing = false;
+                        enableButtons();
                     }
                 };
                 
+                const format = formatSelect.value;
                 if (format === 'png') {
-                    cvs.toBlob(onBlobCreated, "image/png");
+                    cvs.toBlob(processBlob, "image/png");
                 } else {
-                    const quality = qualityRange ? parseInt(qualityRange.value) / 100 : 0.95;
-                    cvs.toBlob(onBlobCreated, "image/jpeg", quality);
+                    const quality = parseInt(qualityRange.value) / 100;
+                    cvs.toBlob(processBlob, "image/jpeg", quality);
                 }
-            });
-            
-        } catch (error) {
-            // 处理过程中出错，隐藏加载动画
-            hideLoader();
-            throw error;
-        }
+            } catch (error) {
+                hideLoader();
+                showError('解密处理时出错: ' + error.message);
+                releaseLargeObjects();
+                isProcessing = false;
+                enableButtons();
+            }
+        };
         
+        setTimeout(executeDecrypt, 10);
     } catch (error) {
-        if (error.message !== '操作已被取消') {
-            showError('解密处理时出错: ' + error.message);
-        }
-        throw error;
-    } finally {
-        // 注意：这里不再隐藏加载动画，因为加载动画将在图片加载完成后由setImageSrc函数隐藏
+        hideLoader();
+        showError('解密函数调用时出错: ' + error.message);
         isProcessing = false;
-        abortController = null;
         enableButtons();
     }
 }
 
 function encrypt(imgElement, hideButtons = true) {
-    encryptCommon(imgElement, hideButtons).catch(() => {});
+    encryptCommon(imgElement, hideButtons);
 }
 
 function decrypt(imgElement, hideButtons = true) {
-    decryptCommon(imgElement, hideButtons).catch(() => {});
-}
-
-function cancelCurrentOperation() {
-    if (abortController) {
-        abortController.abort();
-        hideLoader();
-        isProcessing = false;
-        enableButtons();
-        console.log('当前操作已取消');
-    }
+    decryptCommon(imgElement, hideButtons);
 }
 
 function downloadImage() {
     try {
-        if (!img || !img.src || img.src === '') return;
+        if (!img.src || img.src === '') return;
         
         const link = document.createElement('a');
         link.download = getDownloadFileName();
@@ -2050,10 +2018,12 @@ function downloadImage() {
     }
 }
 
+// 新增：查看图片函数
 function viewImage() {
     try {
-        if (!img || !img.src || img.src === '') return;
+        if (!img.src || img.src === '') return;
         
+        // 在新窗口打开图片
         window.open(img.src, '_blank');
     } catch (error) {
         showError('查看图片时出错: ' + error.message);
@@ -2062,7 +2032,7 @@ function viewImage() {
 
 function getDownloadFileName() {
     try {
-        const format = formatSelect ? formatSelect.value : 'png';
+        const format = formatSelect.value;
         const prefix = hasEncrypted ? 'encrypted_' : hasDecrypted ? 'decrypted_' : 'image_';
         const timestamp = new Date().getTime();
         const extension = format === 'png' ? 'png' : 'jpg';
@@ -2082,15 +2052,21 @@ function getDownloadFileName() {
 function clearImage() {
     try {
         if (isProcessing) {
-            cancelCurrentOperation();
+            showError('当前有操作正在进行，无法清除图片');
+            return;
         }
         
-        if (img) {
-            img.style.display = "none";
+        img.onerror = null;
+        img.onload = null;
+        
+        img.style.display = "none";
+        
+        setTimeout(() => {
             img.src = "";
-        }
+        }, 10);
         
         releaseAllBlobURLs();
+        
         releaseLargeObjects();
         
         const ipt = document.getElementById("ipt");
@@ -2104,9 +2080,9 @@ function clearImage() {
         currentFileName = "";
         
         resetButtonStates();
-        if (clearBtn) clearBtn.style.display = "none";
-        if (downloadBtn) downloadBtn.style.display = "none";
-        if (viewBtn) viewBtn.style.display = "none";
+        clearBtn.style.display = "none";
+        downloadBtn.style.display = "none";
+        viewBtn.style.display = "none";
         
         console.log('图片已清除，资源已释放');
     } catch (error) {
@@ -2117,8 +2093,6 @@ function clearImage() {
 function addWaveEffect(event, waveColor) {
     try {
         const button = event.currentTarget;
-        if (!button || button.classList.contains('disabled')) return;
-        
         const wave = document.createElement('div');
         wave.className = 'wave';
         
@@ -2135,7 +2109,7 @@ function addWaveEffect(event, waveColor) {
         button.appendChild(wave);
         
         setTimeout(() => {
-            if (wave && wave.parentNode === button) {
+            if (wave && wave.parentNode) {
                 wave.remove();
             }
         }, 800);
@@ -2153,7 +2127,7 @@ const buttons = [
     { element: restoreBtn, color: 'rgba(255, 140, 0, 0.9)' },
     { element: clearBtn, color: 'rgba(50, 205, 50, 0.9)' },
     { element: downloadBtn, color: 'rgba(0, 191, 255, 0.9)' },
-    { element: viewBtn, color: 'rgba(138, 43, 226, 0.9)' },
+    { element: viewBtn, color: 'rgba(138, 43, 226, 0.9)' }, // 新增的查看图片按钮
     { element: clearErrorsBtn, color: 'rgba(255, 140, 0, 0.9)' },
     { element: copyErrorsBtn, color: 'rgba(30, 144, 255, 0.9)' },
     { element: openErrorWindowBtn, color: 'rgba(106, 17, 203, 0.9)' }
@@ -2162,192 +2136,162 @@ const buttons = [
 buttons.forEach(button => {
     if (button.element) {
         button.element.addEventListener('click', (e) => {
-            addWaveEffect(e, button.color);
+            if (!button.element.classList.contains('disabled')) {
+                addWaveEffect(e, button.color);
+            }
         });
     }
 });
 
 const ipt = document.getElementById("ipt");
-if (ipt) {
-    ipt.onchange = () => {
-        try {
-            if (!ipt.files || ipt.files.length === 0) return;
-            
+ipt.onchange = () => {
+    try {
+        if(ipt.files.length > 0){
             if (isProcessing) {
                 showError('当前有操作正在进行，无法选择新图片');
                 return;
             }
-            
             resetButtonStates();
-            
-            if (img) {
-                img.style.display = "none";
-            }
-            
-            const file = ipt.files[0];
-            if (!file.type.startsWith('image/')) {
-                showError('请选择图片文件');
-                ipt.value = "";
-                return;
-            }
-            
-            const fileURL = URL.createObjectURL(file);
+            img.style.display = "none";
+            const fileURL = URL.createObjectURL(ipt.files[0]);
             setImageSrc(fileURL);
-            
             hasImage = true;
-            currentFileName = file.name;
-            
-            if (clearBtn) clearBtn.style.display = "flex";
-            if (downloadBtn) downloadBtn.style.display = "none";
-            if (viewBtn) viewBtn.style.display = "none";
-            
-        } catch (error) {
-            showError('选择图片时出错: ' + error.message);
+            currentFileName = ipt.files[0].name;
+            clearBtn.style.display = "flex";
+            downloadBtn.style.display = "none";
+            viewBtn.style.display = "none";
         }
-    };
-}
-
-if (encBtn) {
-    encBtn.onclick = () => {
-        try {
-            if (isProcessing) return;
-            if (img && img.src && img.src !== '') {
-                if (img) img.style.display = "none";
-                encrypt(img, true);
-            }
-        } catch (error) {
-            showError('点击混淆按钮时出错: ' + error.message);
-        }
-    };
-}
-
-if (decBtn) {
-    decBtn.onclick = () => {
-        try {
-            if (isProcessing) return;
-            if (img && img.src && img.src !== '') {
-                if (img) img.style.display = "none";
-                decrypt(img, true);
-            }
-        } catch (error) {
-            showError('点击解混淆按钮时出错: ' + error.message);
-        }
-    };
-}
-
-if (encMultipleBtn) {
-    encMultipleBtn.onclick = () => {
-        try {
-            if (isProcessing) return;
-            if (img && img.src && img.src !== '') {
-                if (img) img.style.display = "none";
-                encrypt(img, false);
-            }
-        } catch (error) {
-            showError('点击多次混淆按钮时出错: ' + error.message);
-        }
-    };
-}
-
-if (decMultipleBtn) {
-    decMultipleBtn.onclick = () => {
-        try {
-            if (isProcessing) return;
-            if (img && img.src && img.src !== '') {
-                if (img) img.style.display = "none";
-                decrypt(img, false);
-            }
-        } catch (error) {
-            showError('点击多次解混淆按钮时出错: ' + error.message);
-        }
-    };
-}
-
-if (restoreBtn) {
-    restoreBtn.onclick = () => {
-        try {
-            if (isProcessing) {
-                showError('当前有操作正在进行，无法还原图片');
-                return;
-            }
-            
-            const ipt = document.getElementById("ipt");
-            if (ipt && ipt.files && ipt.files.length > 0) {
-                resetButtonStates();
-                if (img) img.style.display = "none";
-                const fileURL = URL.createObjectURL(ipt.files[0]);
-                setImageSrc(fileURL);
-                hasImage = true;
-                
-                if (downloadBtn) downloadBtn.style.display = "none";
-                if (viewBtn) viewBtn.style.display = "none";
-            }
-        } catch (error) {
-            showError('还原原图时出错: ' + error.message);
-        }
-    };
-}
-
-if (downloadBtn) {
-    downloadBtn.onclick = () => {
-        downloadImage();
-    };
-}
-
-if (viewBtn) {
-    viewBtn.onclick = () => {
-        viewImage();
-    };
-}
-
-if (clearBtn) {
-    clearBtn.onclick = () => {
-        clearImage();
-    };
-}
-
-if (formatSelect) {
-    formatSelect.addEventListener('change', function() {
-        try {
-            if (this.value === 'jpg' && qualityOption) {
-                qualityOption.style.display = 'block';
-            } else if (qualityOption) {
-                qualityOption.style.display = 'none';
-            }
-        } catch (error) {
-            showError('更改输出格式时出错: ' + error.message);
-        }
-    });
-}
-
-if (qualityRange) {
-    qualityRange.addEventListener('input', function() {
-        try {
-            if (qualityValue) {
-                qualityValue.textContent = this.value;
-            }
-        } catch (error) {
-            showError('更新质量滑块值时出错: ' + error.message);
-        }
-    });
-    
-    if (qualityValue) {
-        qualityValue.textContent = qualityRange.value;
+    } catch (error) {
+        showError('选择图片时出错: ' + error.message);
     }
 }
 
-window.addEventListener('beforeunload', function(event) {
+encBtn.onclick = () => {
     try {
-        cancelCurrentOperation();
-        releaseAllBlobURLs();
-        releaseLargeObjects();
-        
-        if (isProcessing) {
-            event.preventDefault();
-            event.returnValue = '图片处理正在进行中，确定要离开吗？';
+        if (isProcessing) return;
+        if(img.src && img.src !== ''){
+            img.style.display = "none";
+            encrypt(img, true);
         }
     } catch (error) {
+        showError('点击混淆按钮时出错: ' + error.message);
+    }
+}
+
+decBtn.onclick = () => {
+    try {
+        if (isProcessing) return;
+        if(img.src && img.src !== ''){
+            img.style.display = "none";
+            decrypt(img, true);
+        }
+    } catch (error) {
+        showError('点击解混淆按钮时出错: ' + error.message);
+    }
+}
+
+encMultipleBtn.onclick = () => {
+    try {
+        if (isProcessing) return;
+        if(img.src && img.src !== ''){
+            img.style.display = "none";
+            encrypt(img, false);
+        }
+    } catch (error) {
+        showError('点击多次混淆按钮时出错: ' + error.message);
+    }
+}
+
+decMultipleBtn.onclick = () => {
+    try {
+        if (isProcessing) return;
+        if(img.src && img.src !== ''){
+            img.style.display = "none";
+            decrypt(img, false);
+        }
+    } catch (error) {
+        showError('点击多次解混淆按钮时出错: ' + error.message);
+    }
+}
+
+restoreBtn.onclick = () => {
+    try {
+        if (isProcessing) {
+            showError('当前有操作正在进行，无法还原图片');
+            return;
+        }
+        if(ipt.files.length > 0){
+            resetButtonStates();
+            img.style.display = "none";
+            const fileURL = URL.createObjectURL(ipt.files[0]);
+            setImageSrc(fileURL);
+            hasImage = true;
+            downloadBtn.style.display = "none";
+            viewBtn.style.display = "none";
+        }
+    } catch (error) {
+        showError('还原原图时出错: ' + error.message);
+    }
+}
+
+downloadBtn.onclick = () => {
+    downloadImage();
+};
+
+// 新增：查看图片按钮点击事件
+viewBtn.onclick = () => {
+    viewImage();
+};
+
+clearBtn.onclick = () => {
+    clearImage();
+};
+
+formatSelect.addEventListener('change', function() {
+    try {
+        if(this.value === 'jpg') {
+            qualityOption.style.display = 'block';
+        } else {
+            qualityOption.style.display = 'none';
+        }
+    } catch (error) {
+        showError('更改输出格式时出错: ' + error.message);
+    }
+});
+
+qualityRange.addEventListener('input', debounce(function() {
+    try {
+        qualityValue.textContent = this.value;
+    } catch (error) {
+        showError('更新质量滑块值时出错: ' + error.message);
+    }
+}, 100));
+
+qualityValue.textContent = qualityRange.value;
+
+window.addEventListener('beforeunload', function() {
+    try {
+        releaseAllBlobURLs();
+        releaseLargeObjects();
+    } catch (error) {
         console.error('页面卸载时清理资源出错:', error);
+    }
+});
+
+setInterval(() => {
+    if (document.hidden) {
+        const hiddenTime = Date.now() - (document.hiddenStartTime || Date.now());
+        if (hiddenTime > 5 * 60 * 1000) {
+            releaseLargeObjects();
+        }
+    }
+}, 60000);
+
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        document.hiddenStartTime = Date.now();
+    } else {
+        document.hiddenStartTime = null;
     }
 });
 
@@ -2355,16 +2299,6 @@ if (showErrors) {
     showErrors.checked = false;
     console.log('开发者设置已初始化：弹出报错信息默认关闭');
 }
-
-if (formatSelect && qualityOption) {
-    if (formatSelect.value === 'jpg') {
-        qualityOption.style.display = 'block';
-    } else {
-        qualityOption.style.display = 'none';
-    }
-}
-
-resetButtonStates();
 </script>
 </body>
 </html>
